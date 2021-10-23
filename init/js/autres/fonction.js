@@ -29,6 +29,7 @@ function demarage(){
 
     repere(scene);
 
+
     // deplacement avec souris
     const element = document.getElementById("webgl");
     let controls = new THREE.TrackballControls( camera,element );
@@ -41,13 +42,13 @@ function demarage(){
         stats.update();
     }
     animate();//fin deplacement avec souris
+    controls.rotateSpeed=5;
 
     //tracage du repere
     repere(scene);
 
-    //ajout du guicamera
-
     renduAnim();
+
 
     // ajoute le rendu dans l'element HTML
     document.getElementById("webgl").appendChild(rendu.domElement);

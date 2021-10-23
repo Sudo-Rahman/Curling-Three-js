@@ -115,37 +115,47 @@ function guicamera(gui, camera){
     let guiCamera = gui.addFolder("Camera");
     guiCamera.add(menuGUI, "cameraxPos", -10, 10).onChange(function () {
         camera.position.set(menuGUI.cameraxPos, camera.position.y, camera.position.z);
+        actualisationPosDir()
     });
     guiCamera.add(menuGUI, "camerayPos", -10, 10).onChange(function () {
         camera.position.set(camera.position.x, menuGUI.camerayPos, camera.position.z);
+        actualisationPosDir()
     });
     guiCamera.add(menuGUI, "camerazPos", -10, 10).onChange(function () {
         camera.position.set(camera.position.x, camera.position.y, menuGUI.camerazPos);
+        actualisationPosDir()
     });
     guiCamera.add(menuGUI, "camerazoom", 0, 1).onChange(function () {
         camera.zoom = menuGUI.camerazoom;
         camera.updateProjectionMatrix();
+        actualisationPosDir()
     });
     guiCamera.add(menuGUI, "cameraxDir", -10, 10).onChange(function () {
         camera.getWorldDirection(vect);
         camera.lookAt(menuGUI.cameraxDir, vect.y, vect.z);
+        camera.lookAt(10, 5, 4);
+        actualisationPosDir()
     });
     guiCamera.add(menuGUI, "camerayDir", -10, 10).onChange(function () {
         camera.getWorldDirection(vect);
         camera.lookAt(vect.x, menuGUI.camerayDir, vect.z);
+        camera.updateProjectionMatrix();
+        actualisationPosDir()
     });
     guiCamera.add(menuGUI, "camerazDir", -10, 10).onChange(function () {
         camera.getWorldDirection(vect);
         camera.lookAt(vect.x, vect.y, menuGUI.camerazDir);
+        camera.updateProjectionMatrix();
+        actualisationPosDir()
     });
 
-    //actualisation de des nombres du tableau
-    const clock = new THREE.Clock();
-    function actu() {
-        var delta = clock.getDelta();
-        requestAnimationFrame(actu);
-        actualisationPosDir();
-    }
+    // //actualisation de des nombres du tableau
+    // const clock = new THREE.Clock();
+    // function actu() {
+    //     var delta = clock.getDelta();
+    //     requestAnimationFrame(actu);
+    //     actualisationPosDir();
+    // }
     function actualisationPosDir() {
         document.forms["controle"].PosX.value = menuGUI.cameraxPos;
         document.forms["controle"].PosY.value = menuGUI.camerayPos;
