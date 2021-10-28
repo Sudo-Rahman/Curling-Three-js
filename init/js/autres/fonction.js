@@ -10,18 +10,18 @@ function demarage(){
     rendu.setSize(window.innerWidth * .9, window.innerHeight * .9);
     cameraLumiere(scene, camera);
     lumiere(scene);
-    //repere(scene);
-    let directionalLight=new THREE.DirectionalLight( 0xffffff, 0.5 );
-    directionalLight.position.set( 12, 22, -25 );
-    directionalLight.castShadow = true;
-    scene.add(directionalLight);
+    repere(scene);
+    // let directionalLight=new THREE.DirectionalLight( 0xffffff, 0.5 );
+    // directionalLight.position.set( 12, 22, -25 );
+    // directionalLight.castShadow = true;
+    // scene.add(directionalLight);
     var light = new THREE.HemisphereLight(0x404040, 0xFFFFFF, 0.5);
     scene.add(light);
 
-    var light1 = new THREE.AmbientLight(0xffffff, 0.5);
-    scene.add(light1);
-    var light2 = new THREE.AmbientLight(0xffffff, 0.5);
-    scene.add(light2);
+    // var light1 = new THREE.AmbientLight(0xffffff,0.5);
+    // scene.add(light1);
+    // var light2 = new THREE.AmbientLight(0xffffff, 0.5);
+    // scene.add(light2);
 
     var axes = new THREE.AxesHelper(1);
     scene.add(axes);
@@ -42,7 +42,7 @@ function demarage(){
         stats.update();
     }
     animate();//fin deplacement avec souris
-    controls.rotateSpeed=5;
+    controls.rotateSpeed=1;
 
     //tracage du repere
     repere(scene);
