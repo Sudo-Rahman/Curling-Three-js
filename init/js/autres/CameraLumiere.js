@@ -29,7 +29,7 @@
 //*************************************************************
 
  function lumiere(scene){
-    let lumPt = new THREE.PointLight(0xff55ff);
+    let lumPt = new THREE.PointLight(0xffffff);
     lumPt.position.set(3,3,-3);
     lumPt.intensity = 1;
     lumPt.shadow.camera.far=2000;
