@@ -2,7 +2,7 @@
 
 function Piste(param) {
     const geometrypiste = new THREE.CubeGeometry( param.longueur,param.largeur ,0.01 );
-    const materialpiste = new THREE.MeshPhongMaterial( { side: THREE.DoubleSide, map:param.texture,   emissiveMap:0x000,
+    const materialpiste = new THREE.MeshPhongMaterial( { color: param.coul,side: THREE.DoubleSide, map:param.texture,   emissiveMap:0x000,
         flatShading: true,} );
     const plane = new THREE.Mesh( geometrypiste, materialpiste );
     plane.position.x = 0;
@@ -49,12 +49,12 @@ function Piste(param) {
 
 function Balai(param){
     const geometry_manche = new THREE.CylinderGeometry(param.rayon, param.rayon/1.5,param.hauteur,100);
-    const mesh_manche = new THREE.MeshPhongMaterial({map: param.texture ,side: THREE.DoubleSide});
+    const mesh_manche = new THREE.MeshPhongMaterial({color: param.coulbalai,map: param.texture ,side: THREE.DoubleSide});
     const manche = new THREE.Mesh(geometry_manche,mesh_manche);
     manche.rotation.x = Math.PI/2;
 
     const geometry = new THREE.BoxGeometry( param.longRec, param.largRec, param.hauteurRec );
-    const material = new THREE.MeshBasicMaterial( {color: 0x00ff00,side: THREE.DoubleSide} );
+    const material = new THREE.MeshBasicMaterial( {color: param.coulrec,side: THREE.DoubleSide} );
     const cube = new THREE.Mesh( geometry, material );
     cube.position.x = manche.position.x;
     cube.position.y = manche.position.y;
@@ -65,7 +65,7 @@ function Balai(param){
     //creation des poils
     for (i = 0; i< param.nbPoils; i ++){
         const geometrypoile = new THREE.CylinderGeometry( 0.01, 0, 0.05, 16 );
-        const materialpoile = new THREE.MeshBasicMaterial( {color: 0xffff00,side: THREE.DoubleSide} );
+        const materialpoile = new THREE.MeshBasicMaterial( {color: param.coulPoils,side: THREE.DoubleSide} );
         const cylinder = new THREE.Mesh( geometrypoile, materialpoile );
         cylinder.position.x = Math.random() * param.longRec*0.95-param.longRec*0.95/2;// on calcule une positions x aleatoire en prenant des marge aux bords
         cylinder.position.y = Math.random() * param.largRec* 0.95-param.largRec*0.95/2;// on calcule une positions y aleatoire en prenant des marge aux bords
