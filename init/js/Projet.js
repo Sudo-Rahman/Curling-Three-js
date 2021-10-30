@@ -7,15 +7,15 @@ function init() {
 
 
     //fonction qui retourne les parametres de la piste
-    let dimPiste = new function () {
+    let paramPiste = new function () {
         this.longueur = 10;
         this.largeur = 2;
         this.texture = new THREE.TextureLoader().load('../asset/glace2.jpg');// chargement de la texture pour la piste
         this.coul = "#a7d6ff";
     }
-    //fonction qui retourne les parametres du balai
 
-    let dimBalai = new function () {
+    //fonction qui retourne les parametres du balai
+    let paramBalai = new function () {
         this.rayon = 0.1;
         this.hauteur = 1;
         this.longRec = 0.5;
@@ -28,81 +28,139 @@ function init() {
         this.coulPoils = "#f7f9f9";
     }
 
-    //objets
-    var piste = new Piste(dimPiste);// creation de la piste
-    three[0].add(piste);// ajout de la piste dans la scene
-
-    //fonction qui place le balai a son point de depart
-    function placment_balai() {
-        balais[0].position.x =piste.position.x - 0.70 * (dimPiste.longueur / 2);//sa calcule la position x du balais qui se situe a 0.70% de la moitier de la longueur de la piste, en gros au debut de la piste
-        balais[0].position.y =piste.position.y- dimPiste.largeur/4;// ca correspod au millieu de la largeur de la piste
-        balais[0].position.z = dimBalai.hauteur / 2+0.075;// on le divise pour ne pas qu'une moitier soit d'un coter de la piste et l'autre moitier de l'autre coté de la piste
-
-        balais[1].position.x =piste.position.x - 0.70 * (dimPiste.longueur / 2);
-        balais[1].position.y =piste.position.y+ dimPiste.largeur/4;
-        balais[1].position.z = dimBalai.hauteur / 2+0.075;
+    let paramPierre = new function () {
+        this.taille = 0.1;
+        this.coul = "#eb0f0f";
+        this.coulCentre = "#f7f9f9";
+        this.coul_endroit_pour_tenir ="#48bbbb"
     }
 
-    //parametre de la piste
-    var balais = [new Balai(dimBalai),new Balai(dimBalai)];// on creé deux balais
-    three[0].add(balais[0],balais[1]);
+    //objets
+    var piste = new Piste(paramPiste);// creation de la piste
+    three[0].add(piste);// ajout de la piste dans la scene
+
+
+    var balais = [new Balai(paramBalai), new Balai(paramBalai)];// on creé deux balais
+    three[0].add(balais[0], balais[1]);
     placment_balai();
 
-    function addAndRemoveBalais(){
-        if (!etat_partie){// si la partie est en cours on ne bouge replace pas le balai au point de depart
-            three[0].remove( balais[0],balais[1]);// on enleve le balai de la scene
-            balais = [new Balai(dimBalai),new Balai(dimBalai)];
-            three[0].add(balais[0],balais[1]);// on l'ajoute a la scene
+    //fonction qui place les balais a leur point de depart
+    function placment_balai() {
+        balais[0].position.x = piste.position.x - 0.70 * (paramPiste.longueur / 2);//sa calcule la position x du balais qui se situe a 0.70% de la moitier de la longueur de la piste, en gros au debut de la piste
+        balais[0].position.y = piste.position.y - paramPiste.largeur / 4;// ca correspod au millieu de la largeur de la piste
+        balais[0].position.z = paramBalai.hauteur / 2 + 0.075;// on le divise pour ne pas qu'une moitier soit d'un coter de la piste et l'autre moitier de l'autre coté de la piste
+
+        balais[1].position.x = piste.position.x - 0.70 * (paramPiste.longueur / 2);
+        balais[1].position.y = piste.position.y + paramPiste.largeur / 4;
+        balais[1].position.z = paramBalai.hauteur / 2 + 0.075;
+    }
+
+    //fonction qui sert a ne pas faire des repetitions / il reconstruit les balais en fonctions des parametre du gui
+    function addAndRemoveBalais() {
+        if (!etat_partie) {// si la partie est en cours on ne bouge replace pas le balai au point de depart
+            three[0].remove(balais[0], balais[1]);// on enleve le balai de la scene
+            balais = [new Balai(paramBalai), new Balai(paramBalai)];
+            three[0].add(balais[0], balais[1]);// on l'ajoute a la scene
             placment_balai()
+        }
+    }
+
+    var pierres = [new Pierre(paramPierre)];
+    three[0].add(pierres[0]);
+    placment_pierre();
+
+    function placment_pierre() {
+        pierres[0].position.z = 0.0065;// place la pierre sur la piste
+        pierres[0].position.x = piste.position.x - 0.70 * (paramPiste.longueur / 2);// place la pierre a 0.70% de la moitier de la longueur de la piste, en gros au debut de la piste
+        pierres[0].rotation.z = (Math.PI/2);// tourne la pierre pour que l'endroit ou l'on tient la pierre soit derriere la piste
+    }
+
+
+    function addAndRemovePierres(){
+        if (!etat_partie) {// si la partie est en cours on ne bouge replace pas le balai au point de depart
+            three[0].remove(pierres[0]);// on enleve le balai de la scene
+            pierres = [new Pierre(paramPierre)];
+            three[0].add(pierres[0]);// on l'ajoute a la scene
+            placment_pierre()
         }
     }
 
 
     //gui
     //#################################################
-    let guiPiste = gui.addFolder("Piste");// creation d'un repertoir piste pour le gui
-    guiPiste.add(dimPiste, "longueur", 5, 50).onChange(function () {//modification de la longueur de la piste
+
+    //repertoir pour la piste
+    let guiPiste = gui.addFolder("Piste");// creation d'un repertoir piste dans le gui
+    guiPiste.add(paramPiste, "longueur", 5, 50).onChange(function () {//modification de la longueur de la piste
         if (!etat_partie){// si la partie est en cours on ne bouge replace pas le balai au point de depart
             three[0].remove(piste);// on retire la piste
-            piste = piste = new Piste(dimPiste);//on creé une nouvelle piste avec les parametres du gui
+            piste = piste = new Piste(paramPiste);//on creé une nouvelle piste avec les parametres du gui
             three[0].add(piste);// on ajoute la nouvelle piste a la scene
             placment_balai()
+            placment_pierre()
         }
     });
-    guiPiste.add(dimPiste, "largeur", 1, 10).onChange(function () {//modification de la largeur de la piste
+    guiPiste.add(paramPiste, "largeur", 1, 10).onChange(function () {//modification de la largeur de la piste
         if (!etat_partie){// si la partie est en cours on ne bouge replace pas le balai au point de depart
             three[0].remove(piste);
-            piste = piste = new Piste(dimPiste);
+            piste = piste = new Piste(paramPiste);
             three[0].add(piste);
             placment_balai()
+            placment_pierre()
+        }
+    });
+    guiPiste.addColor(paramPiste, "coul").onChange(function () {//modification de la largeur de la piste
+        if (!etat_partie){// si la partie est en cours on ne bouge replace pas le balai au point de depart
+            three[0].remove(piste);
+            piste = piste = new Piste(paramPiste);
+            three[0].add(piste);
+            placment_balai()
+            placment_pierre()
         }
     });
 
-    let guiBalai = gui.addFolder("balai");// creation d'un repertoir piste pour le gui du balai
-    guiBalai.add(dimBalai, "rayon", 0.07, 0.15).onChange(function () {//modification de la largeur de la piste
+    // repertoir pour les balais
+    let guiBalai = gui.addFolder("balai");// creation d'un repertoir piste dans le gui du balai
+    guiBalai.add(paramBalai, "rayon", 0.07, 0.15).onChange(function () {//modification de la largeur de la piste
         addAndRemoveBalais();
     });
-    guiBalai.add(dimBalai, "hauteur", 1, 3).onChange(function () {//modification de la largeur de la piste
+    guiBalai.add(paramBalai, "hauteur", 1, 3).onChange(function () {//modification de la largeur de la piste
         addAndRemoveBalais();
     });
-    guiBalai.add(dimBalai, "longRec", 0.5, 2).onChange(function () {//modification de la largeur de la piste
+    guiBalai.add(paramBalai, "longRec", 0.5, 2).onChange(function () {//modification de la largeur de la piste
         addAndRemoveBalais();
     });
-    guiBalai.add(dimBalai, "largRec", 0.25, 1).onChange(function () {//modification de la largeur de la piste
+    guiBalai.add(paramBalai, "largRec", 0.25, 1).onChange(function () {//modification de la largeur de la piste
         addAndRemoveBalais();
     });
-    guiBalai.addColor(dimBalai, "coulbalai").onChange(function () {//modification de la largeur de la piste
+    guiBalai.addColor(paramBalai, "coulbalai").onChange(function () {//modification de la largeur de la piste
         addAndRemoveBalais();
     });
-    guiBalai.add(dimBalai, "nbPoils", 10, 1000).onChange(function () {//modification de la largeur de la piste
+    guiBalai.add(paramBalai, "nbPoils", 10, 1000).onChange(function () {//modification de la largeur de la piste
         addAndRemoveBalais();
     });
-    guiBalai.addColor(dimBalai, "coulPoils").onChange(function () {//modification de la largeur de la piste
+    guiBalai.addColor(paramBalai, "coulPoils").onChange(function () {//modification de la largeur de la piste
         addAndRemoveBalais();
     });
-    guiBalai.addColor(dimBalai, "coulrec").onChange(function () {//modification de la largeur de la piste
+    guiBalai.addColor(paramBalai, "coulrec").onChange(function () {//modification de la largeur de la piste
         addAndRemoveBalais();
     });
+
+    let guiPierre = gui.addFolder("Pirre");// creation d'un repertoir Pirre dans le gui
+    guiPierre.add(paramPierre, "taille", 0.1, 0.5).onChange(function () {//modification de la largeur de la piste
+        addAndRemovePierres()
+    });
+    guiPierre.addColor(paramPierre, "coulCentre").onChange(function () {//modification de la largeur de la piste
+        addAndRemovePierres()
+    });
+    guiPierre.addColor(paramPierre, "coul").onChange(function () {//modification de la largeur de la piste
+        addAndRemovePierres()
+    });
+    guiPierre.addColor(paramPierre, "coul_endroit_pour_tenir").onChange(function () {//modification de la largeur de la piste
+        addAndRemovePierres()
+    });
+
+
 
     //#################################################
 
