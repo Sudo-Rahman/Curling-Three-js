@@ -36,7 +36,8 @@ body {
 p{
  font-size: xx-large;
  color: red;
- margin-bottom: 0;
+ margin-bottom: 10px;
+ margin-top: 15px;
 }
 #equipe1 {
  margin-bottom: 10px;
