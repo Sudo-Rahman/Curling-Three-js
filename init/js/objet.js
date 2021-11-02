@@ -62,7 +62,7 @@ function Balai(param) {
     manche.rotation.x = Math.PI / 2;
 
     const geometry = new THREE.BoxGeometry(param.longRec, param.largRec, param.hauteurRec);
-    const material = new THREE.MeshBasicMaterial({color: param.coulrec, side: THREE.DoubleSide, specular : 0x111111});
+    const material = new THREE.MeshPhongMaterial({color: param.coulrec, side: THREE.DoubleSide, specular : 0x111111});
     const cube = new THREE.Mesh(geometry, material);
     cube.position.x = manche.position.x;
     cube.position.y = manche.position.y;
@@ -73,7 +73,7 @@ function Balai(param) {
     //creation des poils
     for (i = 0; i < param.nbPoils; i++) {
         const geometrypoile = new THREE.CylinderGeometry(0.01, 0, 0.05, 16);
-        const materialpoile = new THREE.MeshBasicMaterial({color: param.coulPoils, side: THREE.DoubleSide, specular : 0x111111});
+        const materialpoile = new THREE.MeshPhongMaterial({color: param.coulPoils, side: THREE.DoubleSide, specular : 0x111111});
         const cylinder = new THREE.Mesh(geometrypoile, materialpoile);
         cylinder.position.x = Math.random() * param.longRec * 0.95 - param.longRec * 0.95 / 2;// on calcule une positions x aleatoire en prenant des marge aux bords
         cylinder.position.y = Math.random() * param.largRec * 0.95 - param.largRec * 0.95 / 2;// on calcule une positions y aleatoire en prenant des marge aux bords
@@ -90,7 +90,7 @@ function Balai(param) {
 //creation de la pierre
 function Pierre(param) {
     //creation d'un disque qui sera le bas de la pierre
-    const surface_bas_circle = new THREE.Mesh(new THREE.CircleGeometry(0.05 + param.taille * 0.3, 256), new THREE.MeshBasicMaterial({
+    const surface_bas_circle = new THREE.Mesh(new THREE.CircleGeometry(0.05 + param.taille * 0.3, 256), new THREE.MeshPhongMaterial({
         color: param.coul,
         side: THREE.DoubleSide,
         specular : 0x111111
@@ -150,7 +150,7 @@ function Pierre(param) {
 
 
     //creation d'un disque qui fermera le haut du disque
-    const surface_haut_circle = new THREE.Mesh(new THREE.CircleGeometry(0.05 + param.taille * 0.3, 256), new THREE.MeshBasicMaterial({
+    const surface_haut_circle = new THREE.Mesh(new THREE.CircleGeometry(0.05 + param.taille * 0.3, 256), new THREE.MeshPhongMaterial({
         color: param.coul,
         side: THREE.DoubleSide,
         specular : 0x111111
@@ -161,14 +161,14 @@ function Pierre(param) {
 
 
     //creation de l'endroit ou l'on tient la pierre grace a 2 cylindres qui sont de dimension 0.2 fois le nombre du gui
-    const endroit_pour_tenir_geometry = new THREE.Mesh(new THREE.CylinderGeometry(param.taille * 0.2, param.taille * 0.2, param.taille * 1.5, 64), new THREE.MeshBasicMaterial({
+    const endroit_pour_tenir_geometry = new THREE.Mesh(new THREE.CylinderGeometry(param.taille * 0.2, param.taille * 0.2, param.taille * 1.5, 64), new THREE.MeshPhongMaterial({
         color: param.coul_endroit_pour_tenir,
         side: THREE.DoubleSide,
     }));
     endroit_pour_tenir_geometry.position.z = surface_haut_circle.position.z;// positionnement sur le haut de la pierre
     endroit_pour_tenir_geometry.rotation.x = Math.PI / 2; // tourne le cylindre a la verticale
 
-    const endroit_pour_tenir_geometry1 = new THREE.Mesh(new THREE.CylinderGeometry(param.taille * 0.2, param.taille * 0.2, param.taille * 1.5, 64), new THREE.MeshBasicMaterial({
+    const endroit_pour_tenir_geometry1 = new THREE.Mesh(new THREE.CylinderGeometry(param.taille * 0.2, param.taille * 0.2, param.taille * 1.5, 64), new THREE.MeshPhongMaterial({
         color: param.coul_endroit_pour_tenir,
         side: THREE.DoubleSide,
         specular : 0x111111

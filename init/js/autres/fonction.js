@@ -38,9 +38,16 @@ function demarage(){
         rendu.render(scene, camera);
         stats.update();
     }
-    animate();//fin deplacement avec souris
+    //animate();//fin deplacement avec souris
     controls.rotateSpeed=1;
 
+
+    camera.lookAt(3, -5, -3);
+    camera.zoom = 0.5;
+    camera.position.x =0;
+    camera.position.y = 10;
+    camera.position.z = 10;
+    camera.updateProjectionMatrix();
     //tracage du repere
     repere(scene);
 
@@ -70,5 +77,5 @@ function demarage(){
 // ajoute le rendu dans l'element HTML
         rendu.render(scene, camera);
     }
-    return [scene,camera];
+    return [scene,camera,rendu];
 }

@@ -18,6 +18,8 @@
     <script type="text/javascript" src="../js/autres/02_courbesMenuGUI.js"></script>
     <script type="text/javascript" src="../js/autres/fonction.js"></script>
     <script type="text/javascript" src="../js/objet.js"></script>
+    <script type="text/javascript" src="../js/deplacement.js"></script>
+    <script type="text/javascript" src="../js/partie.js"></script>
     <script type="text/javascript" src="../js/Projet.js"></script>
     <link rel="stylesheet" href="../css/init.css">
 </head>
@@ -25,32 +27,35 @@
 
 <body onload="init()">
     <div id="webgl"></div>
-    <div id="'partie">
-        <input id="commencer" type="button" value="commencer partie" onclick="etat_partie = true;">
-        <input id="arreter" type="button" value="arreter partie" onclick="etat_partie = false;">
-    </div>
+    <p id="mess"></p>
     <form id="controle" action="mailto:toto@wanadoo.fr" method="post">
       <fieldset>
-        <legend>Contrôle de la camara et affichage du repère</legend>
+        <legend>Tableau des informations sur la partie</legend>
         <div>
-          <table id="TableauCamera">
+          <table id="game">
           <tr>
-            <th>Géométrie</th>
-            <th>Abscisse</th>
-            <th>Ordonnée</th>
-            <th>Cote</th>
+            <th>lancers</th>
+            <th>1</th>
+            <th>2</th>
+            <th>3</th>
+            <th>4</th>
+            <th>5</th>
           </tr>
           <tr>
-            <td>Position</td>
-            <td><input type="number" id="PosX"  name="PosX" min="-20" max="20" step="0.25" value="0"  /></td>
-            <td><input type="number" id="PosY"  name="PosY" min="-20" max="20" step="0.25" value="-4"  /></td>
-            <td><input type="number" id="PosZ"  name="PosZ" min="-20" max="20" step="0.25" value="0"  /></td>
+            <td style="width: 10%">Equipe 1</td>
+            <td id="E1L1"></td>
+            <td id="E1L2"></td>
+            <td id="E1L3"></td>
+            <td id="E1L4"></td>
+            <td id="E1L5"></td>
           </tr>
           <tr>
-            <td>Direction</td>
-            <td><input type="number" id="DirX"  name="DirX" min="-20" max="20" step="0.25" value="0"  /></td>
-            <td><input type="number" id="DirY"  name="DirY" min="-20" max="20" step="0.25" value="0"  /></td>
-            <td><input type="number" id="DirZ"  name="DirZ" min="-20" max="20" step="0.25" value="0.5"  /></td>
+            <td style="width: 10%">Equipe 2</td>
+            <td id="E2L1"></td>
+            <td id="E2L2"></td>
+            <td id="E2L3"></td>
+            <td id="E2L4"></td>
+            <td id="E2L5"></td>
           </tr>
           </table>
         </div>
