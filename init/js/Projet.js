@@ -43,9 +43,11 @@ function init() {
 
     //####################### PARAMETRE Phisiques des lancers ######################
 
+    //parametres des lancers
     let paramLancer = new function () {
         this.forceN = 5;
         this.force_de_frottement = 0.2;
+        this.intensite = 0.2;
         this.ajouter = function () {
         };
         this.lancer = function () {
@@ -56,13 +58,13 @@ function init() {
     let partie = new function () {
         this.equipe = {
             equipe1: {
-                coul: "#1252d5",// couleur par defaut de l'equipe
+                coul: "#eb0f0f",// couleur par defaut de l'equipe
                 paraPierre: {},// dictionnair qui contient les parametre des pierres de l'equipe
                 pierres: [],//list qui contient les pierre de l'equipe
                 points: [],//liste qui va repertorier la distance des pierre de l'equipe
             },
             equipe2: {
-                coul: "#ff0045",
+                coul: "#ffffff",
                 paraPierre: {},
                 pierres: [],
                 points: [],
@@ -130,12 +132,37 @@ function init() {
         }
     }
 
-    //fonction qui va animer les balais qui frottent le sole
-    function animeBalais(pierre) {
+    //fonction qui va animer les balais qui frottent le sole en avant
+    function animeBalaisY(pierre, delta, signe) {
+        if (-paramLancer.intensite > balais[0].position.y || balais[0].position.y > paramLancer.intensite) {
+            return false;
+
+        }else{
+            balais[0].position.y += pierre.position.y + delta * signe;
+            console.log(balais[0].position.y);
+            balais[1].position.y += pierre.position.y + delta * (-signe);
+            console.log(balais[1].position.y);
+            return true;
+        }
+    }
+
+    //fonction qui va animer les balais qui frottent le sole en arriere
+    function animeBalaisY2(pierre, delta, signe) {
+        console.log(-0.01 > balais[0].position.y && 0.01 > balais[0].position.y);
+        if (-0.01 > balais[0].position.y && 0.01 > balais[0].position.y) {
+            return true;
+        }else{
+            balais[0].position.y += pierre.position.y + delta * (-signe);
+            console.log(balais[0].position.y);
+            balais[1].position.y += pierre.position.y + delta * signe;
+            console.log(balais[1].position.y);
+            return false;
+        }
+    }
+
+    function animeBalaisX(pierre) {
         balais[0].position.x = pierre.position.x + 0.1 + paramBalai.longRec;
-        balais[1].position.x = pierre.position.x + 0.1 + paramBalai.longRec * 2;
-        balais[0].position.y = pierre.position.y + 0.5 * (Math.random() - 0.5);
-        balais[1].position.y = pierre.position.y + 0.5 * (Math.random() - 0.5);
+        balais[1].position.x = pierre.position.x + 0.1 + paramBalai.longRec * 2.1;
     }
 
     function addAndRemovePiste() {
@@ -206,7 +233,7 @@ function init() {
     var vectpierre = new THREE.Vector2(0, 0); // variable qui va stocker les coordonné de la pierre
     var compteur = 0; // compteur qui servira pour gerer les tours
     var vectcentreMaison = new THREE.Vector2(0, 0); // var qui stock les coordonné du centre de la maison
-    var le_plus_proche = 1000; // var initialisé a 1000 qui va servir de comparaison pour connaitre la pierre la plus proche du centre de la maison
+    var le_plus_proche = {equipe: -1, distance: 10000}; // var initialisé a 1000 qui va servir de comparaison pour connaitre la pierre la plus proche du centre de la maison
     var alertmess = true; // var initialisé a vrai qui sert a ne pas spamé d'alert
     var mess = document.getElementById("mess"); // var qui stock l'element html mess ou sera indiqué le tour d'une equipe et qui annoncera le gagnant
     var webgl = document.getElementById("webgl");// var qui l'element html webgl
@@ -312,6 +339,8 @@ function init() {
     });
     guiLancer.add(paramLancer, "force_de_frottement", 0.001, 0.99).onChange(function () {//modification de la largeur de la piste
     });
+    guiLancer.add(paramLancer, "intensite", 0.1, 5).name("intensité balais").onChange(function () {//modification de la largeur de la piste
+    });
     guiLancer.add(paramLancer, "ajouter").name("Ajouter la pierre").onChange(function () {//modification de la largeur de la piste
         if (etat_partie && lancer_ok_point_d_interogation) {
             placment_balai();
@@ -322,9 +351,9 @@ function init() {
         }
     });
     guiLancer.add(paramLancer, "lancer").onChange(function () {//modification de la largeur de la piste
-        if (etat_partie && lancer_ok_point_d_interogation && pierre_ajouter_a_la_piste_point_d_interogation) {
+        if (etat_partie && lancer_ok_point_d_interogation && pierre_ajouter_a_la_piste_point_d_interogation && compteur !== 9) {
             let acceleration = 0;
-            let distance = null;
+            let lancerr = null;
             let messs = "";
             let pierre = pierres[compteur];
             let coul = "";
@@ -340,31 +369,42 @@ function init() {
                 coul = partie.equipe.equipe2.coul;
                 console.log(acceleration, partie.equipe.equipe2.paraPierre.masse)
             }
+            var clock = new THREE.Clock();
+            acceleration *= 3;
+            let signe = (Math.random() < 0.5 ? -1 : 1);// signe qui va permettre de faire sois un aller soit un retour des balais
+            let balais = true;
             lancer();
             lancer_ok_point_d_interogation = false;
             pierre_ajouter_a_la_piste_point_d_interogation = false;
 
             function lancer() {
-                if (acceleration > 0.001) {
-                    deplacementRectiligne(pierre, acceleration);
-                    animeBalais(pierre);
-                    acceleration = acceleration * paramLancer.force_de_frottement;
-                    three[2].render(three[0], three[1]);
+                if (acceleration * 10 > 0.001) {
                     requestAnimationFrame(lancer);
+                    deplacementRectiligne(pierre, acceleration);
+                    animeBalaisX(pierre)
+                    if (balais){
+                        balais = animeBalaisY(pierre, clock.getDelta(), signe, paramLancer.intensite);
+                    }else {
+                        balais = animeBalaisY2(pierre, clock.getDelta(), signe, paramLancer.intensite);
+                    }
+                    acceleration = acceleration * paramLancer.force_de_frottement;// calcule non scientifique
+                    three[2].render(three[0], three[1]);
                 } else {
                     if (pierre.position.x > paramPiste.longueur / 2 + piste.position.x) {
                         three[0].remove(pierre);
                         messs.innerHTML = "Hors piste";
-                        distance = null;
+                        lancerr = {equipe: compteur % 2, distance: null};
                     } else {
                         vectpierre = new THREE.Vector2(pierre.position.x, pierre.position.y);
-                        distance = Math.round(vectcentreMaison.distanceTo(vectpierre) * 100) / 100;
-                        messs.innerHTML = distance + " m du centre de la maison";
+                        lancerr = {
+                            equipe: compteur % 2,
+                            distance: Math.round(vectcentreMaison.distanceTo(vectpierre) * 100) / 100
+                        };
+                        messs.innerHTML = lancerr.distance + " m du centre de la maison";
                     }
                     lancer_ok_point_d_interogation = true;
                     placment_balai();
-                    coull(coul, distance);
-                    compteurr(distance);
+                    coull(coul, lancerr);
                     message_tour();
                 }
             }
@@ -374,13 +414,13 @@ function init() {
 
     });
 
-    function compteurr(distance) {
-        switch (compteur % 2) {
+    function compteurr(lancer) {
+        switch (lancer.equipe) {
             case 0 :
-                partie.equipe.equipe1.points.push(distance);
+                partie.equipe.equipe1.points.push(lancer.distance);
                 break;
             case 1 :
-                partie.equipe.equipe2.points.push(distance);
+                partie.equipe.equipe2.points.push(lancer.distance);
                 break;
         }
         if (compteur === 9) {
@@ -392,27 +432,29 @@ function init() {
     }
 
     // fonction qui change la couleur de l'ecriture dans le tableau en fonction de l'equipe qui la plus petite valeur
-    function coull(coul, distance) {
-        if (distance !== null) {// on verifie que le lancer n'est pas hors piste
+    function coull(coul, lancer) {
+        if (lancer.distance !== null) {// on verifie que le lancer n'est pas hors piste
             let tr = document.getElementsByTagName('tr');
-            if (le_plus_proche === distance) {// si le lancer effectue
-                coul = "black";
-                for (i = 1; i < tr.length; i++) {
-                    for (o = 1; o < 6; o++) {
-                        tr[i].children[o].style.color = coul;
+            if (le_plus_proche.equipe !== lancer.equipe) {// si le lancer effectue est de la meme equipe que le lancer de plus proche
+                if (le_plus_proche.distance === lancer.distance) {// et si la distance est identique
+                    coul = "black";
+                    for (i = 1; i < tr.length; i++) {
+                        for (o = 1; o < 6; o++) {
+                            tr[i].children[o].style.color = coul;
+                        }
                     }
                 }
-            }
-            if (le_plus_proche > distance) {
-                le_plus_proche = distance;
-                for (i = 1; i < tr.length; i++) {
-                    for (o = 1; o < 6; o++) {
-                        tr[i].children[o].style.color = coul;
+                if (le_plus_proche.distance > lancer.distance) {
+                    le_plus_proche = lancer;
+                    for (i = 1; i < tr.length; i++) {
+                        for (o = 1; o < 6; o++) {
+                            tr[i].children[o].style.color = coul;
+                        }
                     }
                 }
             }
         }
-
+        compteurr(lancer);
     }
 
     // fonction qui actualise le message de la page html pour les tours
@@ -450,7 +492,7 @@ function init() {
 
                 }
             }
-        }else{
+        } else {
             mess.innerHTML = "Aucune equipe n'a gagné car tous les lancers sont hors piste ";
             mess.style.color = "black";
         }
@@ -459,12 +501,13 @@ function init() {
     // fonction qui verifie que la liste en para n'a pas que des valeurs null
     function check_list_contains_only_null_vallues(list) {
         let null_ou_pas = true;
-        for (i = 0; i < list.length(); i++) {
+        for (i = 0; i < list.length; i++) {
             if (list[i] !== null) {
                 null_ou_pas = false
             }
         }
     }
+
 
 
     //######################  FIN GUI  ###########################
