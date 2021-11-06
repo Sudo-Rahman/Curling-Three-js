@@ -52,6 +52,7 @@ function init() {
         };
         this.lancer = function () {
         };
+        this.id_lancer = "rectiligne";
     }
 
     // parametre de la partie
@@ -137,10 +138,10 @@ function init() {
         if (-paramLancer.intensite > balais[0].position.y || balais[0].position.y > paramLancer.intensite) {
             return false;
 
-        }else{
-            balais[0].position.y += pierre.position.y + delta * signe;
+        } else {
+            balais[0].position.y += pierre.position.y + delta * signe ;
             console.log(balais[0].position.y);
-            balais[1].position.y += pierre.position.y + delta * (-signe);
+            balais[1].position.y = -balais[0].position.y;
             console.log(balais[1].position.y);
             return true;
         }
@@ -151,10 +152,10 @@ function init() {
         console.log(-0.01 > balais[0].position.y && 0.01 > balais[0].position.y);
         if (-0.01 > balais[0].position.y && 0.01 > balais[0].position.y) {
             return true;
-        }else{
+        } else {
             balais[0].position.y += pierre.position.y + delta * (-signe);
             console.log(balais[0].position.y);
-            balais[1].position.y += pierre.position.y + delta * signe;
+            balais[1].position.y = -balais[0].position.y;
             console.log(balais[1].position.y);
             return false;
         }
@@ -335,12 +336,10 @@ function init() {
 
     // repertoir pour les lancers
     let guiLancer = gui.addFolder("lancer");
-    guiLancer.add(paramLancer, "forceN", 1, 25).onChange(function () {//modification de la largeur de la piste
-    });
-    guiLancer.add(paramLancer, "force_de_frottement", 0.001, 0.99).onChange(function () {//modification de la largeur de la piste
-    });
-    guiLancer.add(paramLancer, "intensite", 0.1, 5).name("intensité balais").onChange(function () {//modification de la largeur de la piste
-    });
+    guiLancer.add(paramLancer, "forceN", 1, 25);
+    guiLancer.add(paramLancer, "force_de_frottement", 0.001, 0.99);
+    guiLancer.add(paramLancer, "intensite", 0.1, 5).name("intensité balais");
+    guiLancer.add(paramLancer, "id_lancer", ["rectiligne", "bezier"]).name("choix lancer");
     guiLancer.add(paramLancer, "ajouter").name("Ajouter la pierre").onChange(function () {//modification de la largeur de la piste
         if (etat_partie && lancer_ok_point_d_interogation) {
             placment_balai();
@@ -351,7 +350,7 @@ function init() {
         }
     });
     guiLancer.add(paramLancer, "lancer").onChange(function () {//modification de la largeur de la piste
-        if (etat_partie && lancer_ok_point_d_interogation && pierre_ajouter_a_la_piste_point_d_interogation && compteur !== 9) {
+        if (etat_partie && lancer_ok_point_d_interogation && pierre_ajouter_a_la_piste_point_d_interogation) {
             let acceleration = 0;
             let lancerr = null;
             let messs = "";
@@ -372,6 +371,21 @@ function init() {
             var clock = new THREE.Clock();
             acceleration *= 3;
             let signe = (Math.random() < 0.5 ? -1 : 1);// signe qui va permettre de faire sois un aller soit un retour des balais
+            let i = 0;
+            let points;
+            if (paramLancer.id_lancer === "bezier") {
+                let acc = acceleration * 10
+                while (acc > 0.001) {
+                    i++;
+                    acc *= paramLancer.force_de_frottement;
+                }
+                points = deplacementBezier(pierre, paramPiste, piste, vectcentreMaison, paramLancer.forceN, paramLancer.intensite, i);
+                points[0].position.z = 0.1;
+                three[0].add(points[0]);
+                console.log(points.length);
+                i = 0;
+            }
+
             let balais = true;
             lancer();
             lancer_ok_point_d_interogation = false;
@@ -380,17 +394,24 @@ function init() {
             function lancer() {
                 if (acceleration * 10 > 0.001) {
                     requestAnimationFrame(lancer);
-                    deplacementRectiligne(pierre, acceleration);
+                    switch (paramLancer.id_lancer) {
+                        case "rectiligne":
+                            deplacementRectiligne(pierre, acceleration);
+                            break;
+                        case "bezier":
+                            deplacement_bezier_pierre(pierre, points[1][i], acceleration);
+                            i++;
+                    }
                     animeBalaisX(pierre)
-                    if (balais){
-                        balais = animeBalaisY(pierre, clock.getDelta(), signe, paramLancer.intensite);
-                    }else {
-                        balais = animeBalaisY2(pierre, clock.getDelta(), signe, paramLancer.intensite);
+                    if (balais) {
+                        balais = animeBalaisY(pierre, clock.getDelta(), signe);
+                    } else {
+                        balais = animeBalaisY2(pierre, clock.getDelta(), signe);
                     }
                     acceleration = acceleration * paramLancer.force_de_frottement;// calcule non scientifique
                     three[2].render(three[0], three[1]);
                 } else {
-                    if (pierre.position.x > paramPiste.longueur / 2 + piste.position.x) {
+                    if (pierre.position.x > paramPiste.longueur / 2 + piste.position.x || pierre.position.y > paramPiste.largeur / 2 + piste.position.y || -pierre.position.x < -paramPiste.longueur / 2 + piste.position.x) {
                         three[0].remove(pierre);
                         messs.innerHTML = "Hors piste";
                         lancerr = {equipe: compteur % 2, distance: null};
@@ -428,6 +449,7 @@ function init() {
         } else {
             compteur++;
         }
+        console.log(compteur)
 
     }
 
@@ -470,6 +492,7 @@ function init() {
     }
 
     function arreter_partie() {
+        etat_partie = false;
         console.log(partie.equipe.equipe1.points, partie.equipe.equipe2.points);
         // on regarde si les 2 listes n'on que des valeurs null ou pas
         if (!check_list_contains_only_null_vallues(partie.equipe.equipe1.points) && !check_list_contains_only_null_vallues(partie.equipe.equipe2.points)) {
@@ -507,7 +530,6 @@ function init() {
             }
         }
     }
-
 
 
     //######################  FIN GUI  ###########################
