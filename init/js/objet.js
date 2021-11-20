@@ -11,6 +11,13 @@ function Piste(param) {
     plane.position.y = 0;
     plane.position.z = 0;
 
+    const A = new THREE.Vector3(plane.position.x - 0.70 * (param.longueur / 2), plane.position.y - param.largeur / 2, 0);
+    const B = new THREE.Vector3(plane.position.x - 0.70 * (param.longueur / 2), plane.position.y + param.largeur / 2, 0);
+
+
+    const line = segment(A, B, "black",5);//construction de la ligne de depart
+    line.position.z = 0.01;// surelevation de la ligne pour l'apercevoir sur la piste
+
     //creation de 4 disques pour faire la maison
     let inside = param.largeur * 0.60 / 2;// variable qui permet de connaitre la distance interieur du RingGeometry au niveau des bord de la piste
     let outside = param.largeur * 0.90 / 2;// variable qui permet de connaitre la distance l'exterieur du RingGeometry au niveau des bord de la piste
@@ -42,6 +49,7 @@ function Piste(param) {
     //creation du groupe pour tous les objets
     const group = new THREE.Group();
     group.add(plane);
+    group.add(line);
     group.add(circle1);
     group.add(circle2);
     group.add(circle3);

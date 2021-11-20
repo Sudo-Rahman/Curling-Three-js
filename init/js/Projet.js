@@ -12,7 +12,7 @@ function init() {
     let paramPiste = new function () {
         this.longueur = 10;
         this.largeur = 2;
-        this.texture = new THREE.TextureLoader().load('../asset/glace2.jpg');// chargement de la texture pour la piste
+        //this.texture = new THREE.TextureLoader().load('../asset/glace2.jpg');// chargement de la texture pour la piste
         this.coul = "#a7d6ff";
     }
 
@@ -23,7 +23,7 @@ function init() {
         this.longRec = 0.5;
         this.largRec = 0.25;
         this.hauteurRec = 0.05;
-        this.texture = new THREE.TextureLoader().load('../asset/bois.jpg');// chargement de la texture pour le manche du balai
+        //this.texture = new THREE.TextureLoader().load('../asset/bois.jpg');// chargement de la texture pour le manche du balai
         this.nbPoils = 50;
         this.coulbalai = "#783e0c";
         this.coulrec = "#6bc780"
@@ -35,7 +35,6 @@ function init() {
         this.coul = "#eb0f0f";
         this.coulCentre = "#1252d5";
         this.coul_endroit_pour_tenir = "#48bbbb"
-        this.masse_pierre = 16.5 * Math.pow(1 + this.taille, 3);// calcule non scientifique de la masse de la pierre (" ceci n'est pas une simulation")
     }
 
     //####################### FIN PARAMETRE DES OBJETS ######################
@@ -47,7 +46,7 @@ function init() {
     let paramLancer = new function () {
         this.forceN = 5;
         this.force_de_frottement = 0.2;
-        this.intensite = 0.2;
+        this.balai = 0.2;
         this.ajouter = function () {
         };
         this.lancer = function () {
@@ -59,19 +58,17 @@ function init() {
     let partie = new function () {
         this.equipe = {
             equipe1: {
-                coul: "#eb0f0f",// couleur par defaut de l'equipe
-                paraPierre: {},// dictionnair qui contient les parametre des pierres de l'equipe
+                coul: "#1252d5",// couleur par defaut de l'equipe
                 pierres: [],//list qui contient les pierre de l'equipe
                 points: [],//liste qui va repertorier la distance des pierre de l'equipe
             },
             equipe2: {
                 coul: "#ffffff",
-                paraPierre: {},
                 pierres: [],
                 points: [],
             },
         };
-        this.choixequipe = 0;// variable pour selectionner l'equipe et changer les parametres de la pierre de l'equipe selectionné dans le gui
+        this.choixequipe = 1;// variable pour selectionner l'equipe et changer les parametres de la pierre de l'equipe selectionné dans le gui
         this.commencer = function () {//fonction qui va lancer la partie
         };
         this.recommencer = function () {//fonction qui va recommncer la partie
@@ -82,11 +79,8 @@ function init() {
 
     //initialisation des pierres des equipes par defaut
     for (i = 0; i < 5; i++) {
-        partie.equipe.equipe1.pierres.push(new Pierre(paramPierre));
-        partie.equipe.equipe1.paraPierre = {taille: paramPierre.taille, masse: paramPierre.masse_pierre};
-        paramPierre.coulCentre = "#ff0045";
-        partie.equipe.equipe2.pierres.push(new Pierre(paramPierre));
-        partie.equipe.equipe2.paraPierre = {taille: paramPierre.taille, masse: paramPierre.masse_pierre};
+        partie.equipe.equipe1.pierres.push(new Pierrre(paramPierre, 1, partie.equipe.equipe1.coul));
+        partie.equipe.equipe2.pierres.push(new Pierrre(paramPierre, 2, partie.equipe.equipe2.coul));
     }
 
     //####################### fin PARAMETRE Phisiques des lancers ######################
@@ -133,37 +127,25 @@ function init() {
         }
     }
 
-    //fonction qui va animer les balais qui frottent le sole en avant
-    function animeBalaisY(pierre, delta, signe) {
-        if (-paramLancer.intensite > balais[0].position.y || balais[0].position.y > paramLancer.intensite) {
-            return false;
-
-        } else {
-            balais[0].position.y += pierre.position.y + delta * signe ;
-            console.log(balais[0].position.y);
-            balais[1].position.y = -balais[0].position.y;
-            console.log(balais[1].position.y);
-            return true;
+    //fonction qui va animer les balais qui frottent le sole
+    function animebalai(pierre, delta, mode) {
+        switch (mode) {
+            case 1: {
+                balais[0].position.y += pierre.position.y + delta;
+                balais[1].position.y = -balais[0].position.y;
+            }
+                break;
+            case -1: {
+                balais[0].position.y += pierre.position.y - delta;
+                balais[1].position.y = -balais[0].position.y;
+            }
         }
     }
 
-    //fonction qui va animer les balais qui frottent le sole en arriere
-    function animeBalaisY2(pierre, delta, signe) {
-        console.log(-0.01 > balais[0].position.y && 0.01 > balais[0].position.y);
-        if (-0.01 > balais[0].position.y && 0.01 > balais[0].position.y) {
-            return true;
-        } else {
-            balais[0].position.y += pierre.position.y + delta * (-signe);
-            console.log(balais[0].position.y);
-            balais[1].position.y = -balais[0].position.y;
-            console.log(balais[1].position.y);
-            return false;
-        }
-    }
 
     function animeBalaisX(pierre) {
-        balais[0].position.x = pierre.position.x + 0.1 + paramBalai.longRec;
-        balais[1].position.x = pierre.position.x + 0.1 + paramBalai.longRec * 2.1;
+        balais[0].position.x = pierre.pierre.position.x + paramBalai.longRec + pierre.taille;
+        balais[1].position.x = pierre.pierre.position.x + paramBalai.longRec * 2.1 + pierre.taille;
     }
 
     function addAndRemovePiste() {
@@ -197,19 +179,22 @@ function init() {
     function addAndRemovePierres() {
         if (!etat_partie) {// on regarle que la partie n'est pas commencé
             let pierres = [];// on creé une liste vierge
-            for (i = 0; i < 5; i++) {//on boucle 5 fois (5 lancers par equipe)
-                pierres.push(new Pierre(paramPierre));// on ajoute les pierres a la liste
-            }
-            if (partie.choixequipe == 0) {//si c'est l'quipe 1 qui a été selectionné dans le gui
-                partie.equipe.equipe1.pierres = pierres; // on affecte la liste de pierre a l'equipe 1
-                partie.equipe.equipe1.paraPierre = {taille: paramPierre.taille, masse: paramPierre.masse_pierre}; //on ajoute les parametres dont on a besoin au cours de la partie
-                partie.equipe.equipe1.coul = paramPierre.coulCentre;
-                masse.setValue(paramPierre.masse_pierre); // on actualise la masse de la pierre on fonction de sa taille dans le gui
-            } else {//si c'est equipe 2
-                partie.equipe.equipe2.pierres = pierres;
-                partie.equipe.equipe2.paraPierre = {taille: paramPierre.taille, masse: paramPierre.masse_pierre};
-                partie.equipe.equipe2.coul = paramPierre.coulCentre;
-                masse.setValue(paramPierre.masse_pierre);
+            switch (partie.choixequipe) {
+                case 1: {//equipe 1 selectionné
+                    partie.equipe.equipe1.coul = paramPierre.coulCentre;
+                    for (i = 0; i < 5; i++) {//on boucle 5 fois
+                        pierres.push(new Pierrre(paramPierre, 1, partie.equipe.equipe1.coul));// on ajoute les pierres a la liste
+                    }
+                    partie.equipe.equipe1.pierres = pierres; // on affecte la liste de pierre a l'equipe 1
+                }
+                    break;
+                case 2: {//equipe 2 selectionné
+                    partie.equipe.equipe2.coul = paramPierre.coulCentre;
+                    for (i = 0; i < 5; i++) {//on boucle 5 fois
+                        pierres.push(new Pierrre(paramPierre, 2, partie.equipe.equipe2.coul));// on ajoute les pierres a la liste
+                    }
+                    partie.equipe.equipe2.pierres = pierres;
+                }
             }
             // console.log(partie.equipe);
         } else {// si la partie a commencé on ne peut pas changer les params des pierres
@@ -224,6 +209,24 @@ function init() {
         }
     }
 
+    let pi = new Pierre(paramPierre);
+    three[0].add(pi);
+    var time = 0;
+    var mode = 1;
+
+    function aaa() {
+        requestAnimationFrame(aaa);
+        pi.position.x += 0.01;
+        animeBalaisX(pi);
+        if (paramPierre.taille + piste.position.y + paramPiste.largeur / 4 <= time) {
+            time = 0;
+            mode *= (-1);
+        }
+        animebalai(pi, 0.014, mode);
+        time += 0.014
+    }
+
+    aaa();
 
     // ####################### FIN CREATION DES OBJETS #####################
 
@@ -293,7 +296,6 @@ function init() {
     //repertoir pour les pierres
     let guiPierre = gui.addFolder("Pierre");// creation d'un repertoir Pirre dans le gui
     guiPierre.add(paramPierre, "taille", 0.1, 0.5).onChange(function () {//modification de la largeur de la piste
-        paramPierre.masse_pierre = 16.5 * Math.pow(1 + paramPierre.taille, 3);// calcule non scientifique de la masse de la pierre (" ceci n'est pas une simulation")
         addAndRemovePierres();
     });
     guiPierre.addColor(paramPierre, "coulCentre").onChange(function () {//modification de la largeur de la piste
@@ -305,11 +307,10 @@ function init() {
     guiPierre.addColor(paramPierre, "coul_endroit_pour_tenir").onChange(function () {
         addAndRemovePierres();
     });
-    let masse = guiPierre.add(paramPierre, "masse_pierre");
 
     // repertoir pour gerer la partie
     let guiPartie = gui.addFolder("Partie");// creation d'un repertoir Partie
-    guiPartie.add(partie, "choixequipe", [0, 1]).name("choix equipe").onChange(function () {
+    guiPartie.add(partie, "choixequipe", [1, 2]).name("choix equipe").onChange(function () {
     });
     guiPartie.add(partie, "commencer").name("Commencer la partie").onChange(function () {
         if (!etat_partie) {
@@ -325,6 +326,7 @@ function init() {
                 pierres.push(partie.equipe.equipe1.pierres[i]);
                 pierres.push(partie.equipe.equipe2.pierres[i]);
             }
+            console.log(pierres)
             // console.log(pierres);
         }
     });
@@ -338,12 +340,12 @@ function init() {
     let guiLancer = gui.addFolder("lancer");
     guiLancer.add(paramLancer, "forceN", 1, 25);
     guiLancer.add(paramLancer, "force_de_frottement", 0.001, 0.99);
-    guiLancer.add(paramLancer, "intensite", 0.1, 5).name("intensité balais");
     guiLancer.add(paramLancer, "id_lancer", ["rectiligne", "bezier"]).name("choix lancer");
     guiLancer.add(paramLancer, "ajouter").name("Ajouter la pierre").onChange(function () {//modification de la largeur de la piste
         if (etat_partie && lancer_ok_point_d_interogation) {
             placment_balai();
-            let pierre = pierres[compteur];
+            let pierre = pierres[compteur].pierre;
+            console.log(pierre);
             three[0].add(pierre);
             placment_pierre(pierre);
             pierre_ajouter_a_la_piste_point_d_interogation = true;
@@ -351,26 +353,22 @@ function init() {
     });
     guiLancer.add(paramLancer, "lancer").onChange(function () {//modification de la largeur de la piste
         if (etat_partie && lancer_ok_point_d_interogation && pierre_ajouter_a_la_piste_point_d_interogation) {
-            let acceleration = 0;
             let lancerr = null;
             let messs = "";
             let pierre = pierres[compteur];
-            let coul = "";
-            if (compteur % 2 === 0) {
-                console.log(acceleration)
-                acceleration = paramLancer.forceN / partie.equipe.equipe1.paraPierre.masse;
-                messs = document.getElementById("equipe1").getElementsByTagName('td')[compteur / 2 + 1];
-                console.log(acceleration, partie.equipe.equipe1.paraPierre.masse)
-                coul = partie.equipe.equipe1.coul;
-            } else {
-                acceleration = paramLancer.forceN / partie.equipe.equipe2.paraPierre.masse;
-                messs = document.getElementById("equipe2").getElementsByTagName('td')[parseInt(compteur / 2) + 1];
-                coul = partie.equipe.equipe2.coul;
-                console.log(acceleration, partie.equipe.equipe2.paraPierre.masse)
+            let coul = pierres[compteur].coul;
+            switch (pierre.equipe) {
+                case 1: {
+                    messs = document.getElementById("equipe1").getElementsByTagName('td')[compteur / 2 + 1];
+                }
+                    break;
+                case 2: {
+                    messs = document.getElementById("equipe2").getElementsByTagName('td')[parseInt(compteur / 2) + 1];
+
+                }
             }
             var clock = new THREE.Clock();
-            acceleration *= 3;
-            let signe = (Math.random() < 0.5 ? -1 : 1);// signe qui va permettre de faire sois un aller soit un retour des balais
+            var delta = clock.getDelta();
             let i = 0;
             let points;
             if (paramLancer.id_lancer === "bezier") {
@@ -379,20 +377,19 @@ function init() {
                     i++;
                     acc *= paramLancer.force_de_frottement;
                 }
-                points = deplacementBezier(pierre, paramPiste, piste, vectcentreMaison, paramLancer.forceN, paramLancer.intensite, i);
+                points = deplacementBezier(pierre, paramPiste, piste, vectcentreMaison, paramLancer.forceN, paramLancer.balai, i);
                 points[0].position.z = 0.1;
                 three[0].add(points[0]);
                 console.log(points.length);
                 i = 0;
             }
-
-            let balais = true;
+            let nbpoints = paramLancer.force_de_frottement*paramLancer.forceN;
             lancer();
             lancer_ok_point_d_interogation = false;
             pierre_ajouter_a_la_piste_point_d_interogation = false;
 
             function lancer() {
-                if (acceleration * 10 > 0.001) {
+                if (i!==nbpoints) {
                     requestAnimationFrame(lancer);
                     switch (paramLancer.id_lancer) {
                         case "rectiligne":
@@ -402,14 +399,13 @@ function init() {
                             deplacement_bezier_pierre(pierre, points[1][i], acceleration);
                             i++;
                     }
-                    animeBalaisX(pierre)
-                    if (balais) {
-                        balais = animeBalaisY(pierre, clock.getDelta(), signe);
-                    } else {
-                        balais = animeBalaisY2(pierre, clock.getDelta(), signe);
+                    animeBalaisX(pierre);
+                    if (pierre.taille + piste.position.y + paramPiste.largeur / 4 <= time) {
+                        time = 0;
+                        mode *= (-1);
                     }
-                    acceleration = acceleration * paramLancer.force_de_frottement;// calcule non scientifique
-                    three[2].render(three[0], three[1]);
+                    animebalai(pi, delta, mode);
+                    time += delta;
                 } else {
                     if (pierre.position.x > paramPiste.longueur / 2 + piste.position.x || pierre.position.y > paramPiste.largeur / 2 + piste.position.y || -pierre.position.x < -paramPiste.longueur / 2 + piste.position.x) {
                         three[0].remove(pierre);

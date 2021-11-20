@@ -1,8 +1,10 @@
 function deplacementRectiligne(pierre, force) {
+    let departx = pierre.position.x;
+    let departy = pierre.position.y;
     pierre.position.x += force * 0.5;
 }
 
-function deplacementBezier(pierre, paraPiste,piste, maisonCentre, force,intensite, nbpoints) {
+function deplacementBezier(pierre, paraPiste,piste, maisonCentre, force,intensite) {
     let departx = pierre.position.x;
     let departy = pierre.position.y;
     let arrivex = maisonCentre.x + (Math.random() < 0.5 ? -0.1 : 0.1);

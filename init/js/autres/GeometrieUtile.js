@@ -15,7 +15,7 @@ function repere(MaScene){
 }
 
 //segment AB
-function segment(MaScene,A,B,CoulHexa,epai){
+function segment(A,B,CoulHexa,epai){
  var geometry = new THREE.Geometry();
  geometry.vertices.push(A,B);
  var line = new THREE.Line(geometry, new THREE.LineDashedMaterial({
@@ -27,7 +27,8 @@ function segment(MaScene,A,B,CoulHexa,epai){
  }));
  //line.computeLineDistances();
  //scene.add(line);
- MaScene.add(line );
+    console.log(geometry.getPoints(150))
+ return line;
 }
 
 function tracePt(MaScene, P, CoulHexa,dimPt){    
