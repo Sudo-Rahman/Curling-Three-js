@@ -1,4 +1,4 @@
-function demarage(){
+function demarage() {
     var stats = initStats();
     // creation de rendu et de la taille
     let rendu = new THREE.WebGLRenderer({antialias: true});
@@ -6,18 +6,32 @@ function demarage(){
     let scene = new THREE.Scene();
     let camera = new THREE.PerspectiveCamera(20, window.innerWidth / window.innerHeight, 0.1, 100);
     rendu.shadowMap.enabled = true;
+    rendu.shadowMapSoft = true;
+    rendu.shadowMap.type = THREE.PCFSoftShadowMap;
     rendu.setClearColor(new THREE.Color(0xFFFFFF));
     rendu.setSize(window.innerWidth * .9, window.innerHeight * .9);
     cameraLumiere(scene, camera);
-    lumiere(scene);
+    //lumiere(scene);
     repere(scene);
-    let directionalLight=new THREE.DirectionalLight( 0xffffff, 0.5 );
-    directionalLight.position.set( 12, 22, -25 );
-    directionalLight.castShadow = true;
-    scene.add(directionalLight);
-    var light = new THREE.HemisphereLight(0x404040, 0xFFFFFF, 0.5);
-    scene.add(light);
+    let light1 = new THREE.DirectionalLight(0xFFFFFF, 1,100); //desklamp spotlight
+    light1.position.set(15, 10, 20);
+    light1.target.position.set(0, 0, 0);
+    light1.shadow.mapSize.width = 2000;
+    light1.shadow.mapSize.height = 2000;
+    light1.castShadow = true;
+    var side = 8;
+    light1.shadow.camera.top = side;
+    light1.shadow.camera.bottom = -side;
+    light1.shadow.camera.left = side;
+    light1.shadow.camera.right = -side;
+    scene.add(light1);
+    scene.add(light1.target);
+    // let helper = new THREE.CameraHelper(light1.shadow.camera);
+    // scene.add(helper);
+    // console.log(helper);
 
+    const light = new THREE.AmbientLight( 0x404040,0.5 ); // soft white light
+    scene.add( light );
 
 
     var axes = new THREE.AxesHelper(1);
@@ -29,8 +43,9 @@ function demarage(){
 
     // deplacement avec souris
     const element = document.getElementById("webgl");
-    let controls = new THREE.TrackballControls( camera,element );
+    let controls = new THREE.TrackballControls(camera, element);
     const clock = new THREE.Clock();
+
     function animate() {
         var delta = clock.getDelta();
         requestAnimationFrame(animate);
@@ -38,16 +53,11 @@ function demarage(){
         rendu.render(scene, camera);
         stats.update();
     }
+
     //animate();//fin deplacement avec souris
-    controls.rotateSpeed=1;
+    controls.rotateSpeed = 1;
 
-
-    camera.lookAt(3, -5, -3);
-    camera.zoom = 0.5;
-    camera.position.x =0;
-    camera.position.y = 10;
-    camera.position.z = 10;
-    camera.updateProjectionMatrix();
+    camera_reset_pos(camera, 0);
     //tracage du repere
     repere(scene);
 
@@ -77,5 +87,16 @@ function demarage(){
 // ajoute le rendu dans l'element HTML
         rendu.render(scene, camera);
     }
-    return [scene,camera,rendu];
+
+    return [scene, camera, rendu];
+}
+
+function camera_reset_pos(camera, zoom) {
+    camera.zoom = 0.5 - zoom;
+    console.log(zoom)
+    camera.position.x = 0;
+    camera.position.z = 10;
+    camera.position.y = 0.001;
+    camera.lookAt(0, 0, 0);
+    camera.updateProjectionMatrix();
 }

@@ -78,11 +78,12 @@ function init() {
 
 
     //initialisation des pierres des equipes par defaut
-    for (i = 0; i < 5; i++) {
+    for (let y = 0; y < 5; y++) {
         partie.equipe.equipe1.pierres.push(new Pierrre(paramPierre, 1, partie.equipe.equipe1.coul));
+        paramPierre.coulCentre = partie.equipe.equipe2.coul;
         partie.equipe.equipe2.pierres.push(new Pierrre(paramPierre, 2, partie.equipe.equipe2.coul));
+        paramPierre.coulCentre = partie.equipe.equipe1.coul;
     }
-
     //####################### fin PARAMETRE Phisiques des lancers ######################
 
 
@@ -128,24 +129,51 @@ function init() {
     }
 
     //fonction qui va animer les balais qui frottent le sole
+    // function animebalai(pierre, delta, mode) {
+    //     switch (mode) {
+    //         case 1: {
+    //             console.log("aaaaaaa")
+    //             balais[0].position.y = pierre.position.y + delta;
+    //             balais[1].position.y = -balais[0].position.y;
+    //             console.log(balais[0].position.y)
+    //         }
+    //             break;
+    //         case -1: {
+    //             console.log(balais[0].position.y)
+    //             console.log("bbbbbbbb")
+    //             balais[0].position.y = pierre.position.y + delta;
+    //             balais[1].position.y = -balais[0].position.y;
+    //             time -= 0.014
+    //         }
+    //     }
+    // }
+
     function animebalai(pierre, delta, mode) {
         switch (mode) {
             case 1: {
-                balais[0].position.y += pierre.position.y + delta;
+                balais[0].position.y = delta;
                 balais[1].position.y = -balais[0].position.y;
             }
                 break;
             case -1: {
-                balais[0].position.y += pierre.position.y - delta;
+                balais[0].position.y = delta;
                 balais[1].position.y = -balais[0].position.y;
             }
         }
     }
 
 
-    function animeBalaisX(pierre) {
-        balais[0].position.x = pierre.pierre.position.x + paramBalai.longRec + pierre.taille;
-        balais[1].position.x = pierre.pierre.position.x + paramBalai.longRec * 2.1 + pierre.taille;
+    function animeBalaisX(pierre, point) {
+        balais[0].position.x = point.x + paramBalai.longRec + pierre.taille;
+        balais[1].position.x = balais[0].position.x + paramBalai.longRec * 1.6;
+    }
+
+    function camera_suivie(camera, pierre) {
+        camera.position.x = pierre.pierre.position.x - pierre.taille - 6;
+        camera.position.y = pierre.pierre.position.y;
+        camera.position.z = 4;
+        camera.lookAt(pierre.pierre.position.x + 1, pierre.pierre.position.y, 1);
+        camera.updateProjectionMatrix();
     }
 
     function addAndRemovePiste() {
@@ -182,7 +210,7 @@ function init() {
             switch (partie.choixequipe) {
                 case 1: {//equipe 1 selectionné
                     partie.equipe.equipe1.coul = paramPierre.coulCentre;
-                    for (i = 0; i < 5; i++) {//on boucle 5 fois
+                    for (let i = 0; i < 5; i++) {//on boucle 5 fois
                         pierres.push(new Pierrre(paramPierre, 1, partie.equipe.equipe1.coul));// on ajoute les pierres a la liste
                     }
                     partie.equipe.equipe1.pierres = pierres; // on affecte la liste de pierre a l'equipe 1
@@ -190,7 +218,7 @@ function init() {
                     break;
                 case 2: {//equipe 2 selectionné
                     partie.equipe.equipe2.coul = paramPierre.coulCentre;
-                    for (i = 0; i < 5; i++) {//on boucle 5 fois
+                    for (let i = 0; i < 5; i++) {//on boucle 5 fois
                         pierres.push(new Pierrre(paramPierre, 2, partie.equipe.equipe2.coul));// on ajoute les pierres a la liste
                     }
                     partie.equipe.equipe2.pierres = pierres;
@@ -209,24 +237,53 @@ function init() {
         }
     }
 
-    let pi = new Pierre(paramPierre);
-    three[0].add(pi);
+    // let pi = new Pierrre(paramPierre, 1, "black");
+    // three[0].add(pi.pierre);
     var time = 0;
     var mode = 1;
+    var min_balais = 0;
+    var max_balais = 0;
 
-    function aaa() {
-        requestAnimationFrame(aaa);
-        pi.position.x += 0.01;
-        animeBalaisX(pi);
-        if (paramPierre.taille + piste.position.y + paramPiste.largeur / 4 <= time) {
-            time = 0;
-            mode *= (-1);
+    function animeBalais(pierre, point) {
+        animeBalaisX(pierre, object[1][i]);
+        max_balais = point.y + paramPierre.taille + piste.position.y + paramPiste.largeur / 6;
+        min_balais = point.y;
+        camera_suivie(three[1], pierres[compteur], vectcentreMaison);
+        animebalai(pierres[compteur].pierre, time, mode);
+        if (mode === 1) {
+            time += 0.014;
+            if (time >= max_balais) {
+                mode *= (-1);
+            }
         }
-        animebalai(pi, 0.014, mode);
-        time += 0.014
+        if (mode === -1) {
+            time -= 0.014;
+            if (time <= min_balais) {
+                mode *= (-1);
+            }
+        }
     }
 
-    aaa();
+
+    function deplacementparam(pierre) {
+        if (object != null) {
+            three[0].remove(object[0]);
+
+        }
+        switch (paramLancer.id_lancer) {
+            case "rectiligne":
+                object = pierre.deplacementRectiligne(vectcentreMaison, paramLancer.forceN * paramLancer.force_de_frottement * 5);
+                three[0].add(object[0]);
+                console.log(object)
+                break;
+            case "bezier":
+                console.log(paramLancer.forceN * paramLancer.force_de_frottement * 5);
+                object = pierre.deplacementBezier(paramPiste, piste, vectcentreMaison, paramLancer.forceN * paramLancer.force_de_frottement * 5, paramLancer.balai);
+                three[0].add(object[0]);
+
+        }
+    }
+
 
     // ####################### FIN CREATION DES OBJETS #####################
 
@@ -237,12 +294,12 @@ function init() {
     var vectpierre = new THREE.Vector2(0, 0); // variable qui va stocker les coordonné de la pierre
     var compteur = 0; // compteur qui servira pour gerer les tours
     var vectcentreMaison = new THREE.Vector2(0, 0); // var qui stock les coordonné du centre de la maison
-    var le_plus_proche = {equipe: -1, distance: 10000}; // var initialisé a 1000 qui va servir de comparaison pour connaitre la pierre la plus proche du centre de la maison
+    var le_plus_proche = 10000; // var initialisé a 1000 qui va servir de comparaison pour connaitre la pierre la plus proche du centre de la maison
     var alertmess = true; // var initialisé a vrai qui sert a ne pas spamé d'alert
     var mess = document.getElementById("mess"); // var qui stock l'element html mess ou sera indiqué le tour d'une equipe et qui annoncera le gagnant
     var webgl = document.getElementById("webgl");// var qui l'element html webgl
     var lancer_ok_point_d_interogation = true;// var initialisé a vrai qui servir a ne pas lancer d'autres pierre avant que celle lancer ne se soit pas arreter
-    var pierre_ajouter_a_la_piste_point_d_interogation = false; // var qui va servir a savoir si la pierre a lancer a été ajoputer sur la piste
+    var object = null;
 
     // ##################### FIN Partie ####################
 
@@ -251,10 +308,10 @@ function init() {
 
     //repertoir pour la piste
     let guiPiste = gui.addFolder("Piste");// creation d'un repertoir piste dans le gui
-    guiPiste.add(paramPiste, "longueur", 5, 50).onChange(function () {//modification de la longueur de la piste
+    guiPiste.add(paramPiste, "longueur", 5, 20).onChange(function () {//modification de la longueur de la piste
         addAndRemovePiste();
     });
-    guiPiste.add(paramPiste, "largeur", 1, 10).onChange(function () {//modification de la largeur de la piste
+    guiPiste.add(paramPiste, "largeur", 1, 4).onChange(function () {//modification de la largeur de la piste
         addAndRemovePiste();
     });
     guiPiste.addColor(paramPiste, "coul").onChange(function () {//modification de la largeur de la piste
@@ -274,10 +331,10 @@ function init() {
     guiBalai.add(paramBalai, "hauteur", 1, 3).onChange(function () {//modification de la largeur de la piste
         addAndRemoveBalais();
     });
-    guiBalai.add(paramBalai, "longRec", 0.5, 2).onChange(function () {//modification de la largeur de la piste
+    guiBalai.add(paramBalai, "longRec", 0.5, 1.5).onChange(function () {//modification de la largeur de la piste
         addAndRemoveBalais();
     });
-    guiBalai.add(paramBalai, "largRec", 0.25, 1).onChange(function () {//modification de la largeur de la piste
+    guiBalai.add(paramBalai, "largRec", 0.25, 0.75).onChange(function () {//modification de la largeur de la piste
         addAndRemoveBalais();
     });
     guiBalai.addColor(paramBalai, "coulbalai").onChange(function () {//modification de la largeur de la piste
@@ -295,7 +352,7 @@ function init() {
 
     //repertoir pour les pierres
     let guiPierre = gui.addFolder("Pierre");// creation d'un repertoir Pirre dans le gui
-    guiPierre.add(paramPierre, "taille", 0.1, 0.5).onChange(function () {//modification de la largeur de la piste
+    guiPierre.add(paramPierre, "taille", 0.1, 0.35).onChange(function () {//modification de la largeur de la piste
         addAndRemovePierres();
     });
     guiPierre.addColor(paramPierre, "coulCentre").onChange(function () {//modification de la largeur de la piste
@@ -322,10 +379,14 @@ function init() {
             tr[1].children[0].style.color = partie.equipe.equipe1.coul;
             tr[2].children[0].style.color = partie.equipe.equipe2.coul;
             etat_partie = true;
-            for (i = 0; i < 5; i++) {// on ajoutes toutes les pierres des 2 equipes dans la var pierres creéé dans la section Partie
+            for (let i = 0; i < 5; i++) {// on ajoutes toutes les pierres des 2 equipes dans la var pierres creéé dans la section Partie
                 pierres.push(partie.equipe.equipe1.pierres[i]);
                 pierres.push(partie.equipe.equipe2.pierres[i]);
             }
+            let pierre = pierres[compteur];
+            three[0].add(pierre.pierre);
+            placment_pierre(pierre.pierre);
+            deplacementparam(pierre);
             console.log(pierres)
             // console.log(pierres);
         }
@@ -338,25 +399,28 @@ function init() {
 
     // repertoir pour les lancers
     let guiLancer = gui.addFolder("lancer");
-    guiLancer.add(paramLancer, "forceN", 1, 25);
-    guiLancer.add(paramLancer, "force_de_frottement", 0.001, 0.99);
-    guiLancer.add(paramLancer, "id_lancer", ["rectiligne", "bezier"]).name("choix lancer");
-    guiLancer.add(paramLancer, "ajouter").name("Ajouter la pierre").onChange(function () {//modification de la largeur de la piste
+    guiLancer.add(paramLancer, "forceN", 1, 25).onChange(function () {
         if (etat_partie && lancer_ok_point_d_interogation) {
-            placment_balai();
-            let pierre = pierres[compteur].pierre;
-            console.log(pierre);
-            three[0].add(pierre);
-            placment_pierre(pierre);
-            pierre_ajouter_a_la_piste_point_d_interogation = true;
+            deplacementparam(pierres[compteur]);
+        }
+    });
+    guiLancer.add(paramLancer, "force_de_frottement", 0.1, 1).onChange(function () {
+        if (etat_partie && lancer_ok_point_d_interogation) {
+            deplacementparam(pierres[compteur]);
+        }
+    });
+    guiLancer.add(paramLancer, "id_lancer", ["rectiligne", "bezier"]).name("choix lancer").onChange(function () {
+        if (etat_partie) {
+            deplacementparam(pierres[compteur]);
         }
     });
     guiLancer.add(paramLancer, "lancer").onChange(function () {//modification de la largeur de la piste
-        if (etat_partie && lancer_ok_point_d_interogation && pierre_ajouter_a_la_piste_point_d_interogation) {
-            let lancerr = null;
+        if (etat_partie && lancer_ok_point_d_interogation) {
+            three[0].remove(object[0]);
+            time = 0;
             let messs = "";
             let pierre = pierres[compteur];
-            let coul = pierres[compteur].coul;
+            let coul = pierres[compteur].couleur;
             switch (pierre.equipe) {
                 case 1: {
                     messs = document.getElementById("equipe1").getElementsByTagName('td')[compteur / 2 + 1];
@@ -368,61 +432,35 @@ function init() {
                 }
             }
             var clock = new THREE.Clock();
-            var delta = clock.getDelta();
+            var delta = null;
             let i = 0;
-            let points;
-            if (paramLancer.id_lancer === "bezier") {
-                let acc = acceleration * 10
-                while (acc > 0.001) {
-                    i++;
-                    acc *= paramLancer.force_de_frottement;
-                }
-                points = deplacementBezier(pierre, paramPiste, piste, vectcentreMaison, paramLancer.forceN, paramLancer.balai, i);
-                points[0].position.z = 0.1;
-                three[0].add(points[0]);
-                console.log(points.length);
-                i = 0;
-            }
-            let nbpoints = paramLancer.force_de_frottement*paramLancer.forceN;
             lancer();
             lancer_ok_point_d_interogation = false;
-            pierre_ajouter_a_la_piste_point_d_interogation = false;
 
             function lancer() {
-                if (i!==nbpoints) {
+                if (i !== object[1].length) {
+                    delta = clock.getDelta();
                     requestAnimationFrame(lancer);
-                    switch (paramLancer.id_lancer) {
-                        case "rectiligne":
-                            deplacementRectiligne(pierre, acceleration);
-                            break;
-                        case "bezier":
-                            deplacement_bezier_pierre(pierre, points[1][i], acceleration);
-                            i++;
-                    }
-                    animeBalaisX(pierre);
-                    if (pierre.taille + piste.position.y + paramPiste.largeur / 4 <= time) {
-                        time = 0;
-                        mode *= (-1);
-                    }
-                    animebalai(pi, delta, mode);
-                    time += delta;
+                    pierre.deplacement(object[1][i]);
+                    animeBalais(pierre.pierre, object[1][i]);
+                    camera_suivie(three[1], pierre);
+                    i++;
                 } else {
-                    if (pierre.position.x > paramPiste.longueur / 2 + piste.position.x || pierre.position.y > paramPiste.largeur / 2 + piste.position.y || -pierre.position.x < -paramPiste.longueur / 2 + piste.position.x) {
-                        three[0].remove(pierre);
+                    if (pierre.pierre.position.x > paramPiste.longueur / 2 + piste.position.x || pierre.pierre.position.y > paramPiste.largeur / 2 + piste.position.y || -pierre.pierre.position.x < -paramPiste.longueur / 2 + piste.position.x) {
+                        three[0].remove(pierre.pierre);
                         messs.innerHTML = "Hors piste";
-                        lancerr = {equipe: compteur % 2, distance: null};
                     } else {
-                        vectpierre = new THREE.Vector2(pierre.position.x, pierre.position.y);
-                        lancerr = {
-                            equipe: compteur % 2,
-                            distance: Math.round(vectcentreMaison.distanceTo(vectpierre) * 100) / 100
-                        };
-                        messs.innerHTML = lancerr.distance + " m du centre de la maison";
+                        vectpierre = new THREE.Vector2(pierre.pierre.position.x, pierre.pierre.position.y);
+                        pierre.distance = Math.round(vectcentreMaison.distanceTo(vectpierre) * 100) / 100;
+                        messs.innerHTML = pierre.distance + " m du centre de la maison";
                     }
                     lancer_ok_point_d_interogation = true;
                     placment_balai();
-                    coull(coul, lancerr);
-                    message_tour();
+                    coull(pierre);
+                    setTimeout(() => {
+                        camera_reset_pos(three[1], paramPiste.longueur / 100)
+                    }, 2000);
+                    addPierreGame();
                 }
             }
         } else {
@@ -431,60 +469,70 @@ function init() {
 
     });
 
-    function compteurr(lancer) {
-        switch (lancer.equipe) {
-            case 0 :
-                partie.equipe.equipe1.points.push(lancer.distance);
-                break;
+    function compteurr(pierre) {
+        switch (pierre.equipe) {
             case 1 :
-                partie.equipe.equipe2.points.push(lancer.distance);
+                partie.equipe.equipe1.points.push(pierre.distance);
+                break;
+            case 2 :
+                partie.equipe.equipe2.points.push(pierre.distance);
                 break;
         }
         if (compteur === 9) {
             arreter_partie();
+            return false;
         } else {
             compteur++;
+            console.log(compteur)
+            return true;
         }
-        console.log(compteur)
 
     }
 
-    // fonction qui change la couleur de l'ecriture dans le tableau en fonction de l'equipe qui la plus petite valeur
-    function coull(coul, lancer) {
-        if (lancer.distance !== null) {// on verifie que le lancer n'est pas hors piste
-            let tr = document.getElementsByTagName('tr');
-            if (le_plus_proche.equipe !== lancer.equipe) {// si le lancer effectue est de la meme equipe que le lancer de plus proche
-                if (le_plus_proche.distance === lancer.distance) {// et si la distance est identique
-                    coul = "black";
-                    for (i = 1; i < tr.length; i++) {
-                        for (o = 1; o < 6; o++) {
-                            tr[i].children[o].style.color = coul;
+    // fonction qui change la couleur de l'ecriture dans le tableau en fonction de l'equipe qui a la plus petite valeur
+    function coull(pierre) {
+        if (compteurr(pierre)) {
+            let pierre_numero = -1;
+            let couleur = 'black';
+            for (let i = 0; i < pierres.length; i++) {
+                if (pierres[i].distance != null) {
+                    if (pierres[i].distance < le_plus_proche) {
+                        pierre_numero = i;
+                        le_plus_proche = pierres[i].distance;
+                        couleur = pierres[i].couleur;
+                        console.log(i)
+                    } else {
+                        if (pierres[i].distance === le_plus_proche) {
+                            pierre_numero = null;
                         }
                     }
                 }
-                if (le_plus_proche.distance > lancer.distance) {
-                    le_plus_proche = lancer;
-                    for (i = 1; i < tr.length; i++) {
-                        for (o = 1; o < 6; o++) {
-                            tr[i].children[o].style.color = coul;
-                        }
-                    }
+                console.log(le_plus_proche, pierre_numero)
+            }
+            console.log(pierres[pierre_numero])
+            let tr = document.getElementsByTagName('tr');
+            for (let i = 1; i < tr.length; i++) {
+                for (let o = 1; o < 6; o++) {
+                    tr[i].children[o].style.color = couleur;
                 }
             }
+            message_tour();
+            if (pierre_numero !== -1&& pierre_numero !=null ) {
+                mess.innerHTML += " : l'équipe n° " + pierres[pierre_numero].equipe + " est en tete avec une distance de : " + le_plus_proche + " m";
+            }
+            if (pierre_numero == null) {
+                mess.innerHTML += " : l'équipe n°1 et n°2 sont à égalité avec une distance de : " + le_plus_proche + " m"
+            }
         }
-        compteurr(lancer);
+
     }
 
-    // fonction qui actualise le message de la page html pour les tours
+
+// fonction qui actualise le message de la page html pour les tours
     function message_tour() {
         mess.innerHTML = "Lancer " + (parseInt(compteur / 2) + 1) + " de l'equipe " + (compteur % 2 + 1);
-        if (compteur % 2 === 0) {
-            mess.style.color = partie.equipe.equipe1.coul;
-            webgl.style.borderColor = partie.equipe.equipe1.coul;
-        } else {
-            mess.style.color = partie.equipe.equipe2.coul;
-            webgl.style.borderColor = partie.equipe.equipe2.coul;
-        }
+        mess.style.color = pierres[compteur].couleur;
+        document.getElementById('webgl').style.borderColor = pierres[compteur].couleur;
     }
 
     function arreter_partie() {
@@ -492,11 +540,11 @@ function init() {
         console.log(partie.equipe.equipe1.points, partie.equipe.equipe2.points);
         // on regarde si les 2 listes n'on que des valeurs null ou pas
         if (!check_list_contains_only_null_vallues(partie.equipe.equipe1.points) && !check_list_contains_only_null_vallues(partie.equipe.equipe2.points)) {
-            let min_equipe1 = Math.min(...partie.equipe.equipe1.points);// on prend le mini de l'equipe 1
-            let min_equipe2 = Math.min(...partie.equipe.equipe2.points);// on prend le mini de l'equipe 2
+            let min_equipe1 = getmini(partie.equipe.equipe1.points);// on prend le mini de l'equipe 1
+            let min_equipe2 = getmini(partie.equipe.equipe2.points);// on prend le mini de l'equipe 2
             console.log(min_equipe2, min_equipe1)
             if (min_equipe1 === min_equipe2) {// si c'est egalité
-                mess.innerHTML = "Egalité avec une distance de " + min_equipe1 + " pour l'équipe 1 et " + min_equipe2 + " pour l'équipe 2";
+                mess.innerHTML = "Partie terminé avec égalité entre les 2 equipes";
                 mess.style.color = "black";
             } else {
                 if (min_equipe1 < min_equipe2) {// si l'equipe 1 gagne
@@ -517,18 +565,37 @@ function init() {
         }
     }
 
-    // fonction qui verifie que la liste en para n'a pas que des valeurs null
+// fonction qui verifie que la liste en para ne contient que des valeurs null
     function check_list_contains_only_null_vallues(list) {
         let null_ou_pas = true;
-        for (i = 0; i < list.length; i++) {
+        for (let i = 0; i < list.length; i++) {
             if (list[i] !== null) {
                 null_ou_pas = false
             }
         }
     }
 
+    function getmini(tab) {
+        let tab1 = [];
+        for (let i = 0; i < tab.length; i++) {
+            if (tab[i] !== null) {
+                tab1.push(tab[i]);
+            }
+        }
+        return Math.min(...tab1);
+    }
 
-    //######################  FIN GUI  ###########################
+    function addPierreGame() {
+        placment_balai();
+        let pierre = pierres[compteur].pierre;
+        console.log(pierre);
+        three[0].add(pierre);
+        placment_pierre(pierre);
+        deplacementparam(pierres[compteur]);
+    }
+
+
+//######################  FIN GUI  ###########################
 
 }
 

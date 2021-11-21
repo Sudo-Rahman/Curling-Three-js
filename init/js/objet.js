@@ -2,9 +2,7 @@
 function Piste(param) {
     const geometrypiste = new THREE.CubeGeometry(param.longueur, param.largeur, 0.01);
     const materialpiste = new THREE.MeshPhongMaterial({
-        color: param.coul, side: THREE.DoubleSide, map: param.texture, emissiveMap: 0x000,
-        flatShading: true,
-        specular : 0x111111
+        color: param.coul,emissive : 0x0, shininess : 100,
     });
     const plane = new THREE.Mesh(geometrypiste, materialpiste);
     plane.position.x = 0;
@@ -24,27 +22,28 @@ function Piste(param) {
     const geometrydisque1 = new THREE.RingGeometry(inside, outside, 150);
     const materialdisque1 = new THREE.MeshPhongMaterial({color: 'blue', side: THREE.DoubleSide, specular : 0x111111});
     const circle1 = new THREE.Mesh(geometrydisque1, materialdisque1);
-    circle1.position.x = param.longueur / 2 + plane.position.x - param.longueur / 10;
+    circle1.position.x = param.longueur / 2 + plane.position.x - param.largeur/1.8;
     circle1.position.y = plane.position.y;
     circle1.position.z = 0.01;
     const geometrydisque2 = new THREE.RingGeometry(inside / 1.5, outside / 1.5, 150);
     const materialdisque2 = new THREE.MeshPhongMaterial({color: 'white', side: THREE.DoubleSide, specular : 0x111111});
     const circle2 = new THREE.Mesh(geometrydisque2, materialdisque2);
-    circle2.position.x = param.longueur / 2 + plane.position.x - param.longueur / 10;
+    circle2.position.x = param.longueur / 2 - param.largeur/1.8;
     circle2.position.y = plane.position.y;
     circle2.position.z = 0.01;
     const geometrydisque3 = new THREE.RingGeometry(inside / 2 / 2, outside / 1.5 / 1.5, 150);
     const materialdisque3 = new THREE.MeshPhongMaterial({color: 'red', side: THREE.DoubleSide, specular : 0x111111});
     const circle3 = new THREE.Mesh(geometrydisque3, materialdisque3);
-    circle3.position.x = param.longueur / 2 + plane.position.x - param.longueur / 10;
+    circle3.position.x = param.longueur / 2 - param.largeur/1.8;
     circle3.position.y = plane.position.y;
     circle3.position.z = 0.01;
     const geometrydisque4 = new THREE.CircleGeometry(outside / 2 / 2 / 1.5, 150);
     const materialdisque4 = new THREE.MeshPhongMaterial({color: 'white', side: THREE.DoubleSide, specular : 0x111111});
     const circle4 = new THREE.Mesh(geometrydisque4, materialdisque4);
-    circle4.position.x = param.longueur / 2 + plane.position.x - param.longueur / 10;
+    circle4.position.x = param.longueur / 2 - param.largeur/1.8;
     circle4.position.y = plane.position.y;
     circle4.position.z = 0.01;
+
 
     //creation du groupe pour tous les objets
     const group = new THREE.Group();
@@ -54,7 +53,9 @@ function Piste(param) {
     group.add(circle2);
     group.add(circle3);
     group.add(circle4);
-
+    for(let i=0;i<group.children.length;i++){
+        group.children[i].receiveShadow = true;
+    }
     return group;
 }
 
@@ -63,14 +64,14 @@ function Balai(param) {
     const geometry_manche = new THREE.CylinderGeometry(param.rayon, param.rayon / 1.5, param.hauteur, 100);
     const mesh_manche = new THREE.MeshPhongMaterial({
         color: param.coulbalai,
-        map: param.texture,
+        //map: param.texture,
         side: THREE.DoubleSide
     });
     const manche = new THREE.Mesh(geometry_manche, mesh_manche);
     manche.rotation.x = Math.PI / 2;
 
     const geometry = new THREE.BoxGeometry(param.longRec, param.largRec, param.hauteurRec);
-    const material = new THREE.MeshPhongMaterial({color: param.coulrec, side: THREE.DoubleSide, specular : 0x111111});
+    const material = new THREE.MeshPhongMaterial({color: param.coulrec,depthWrite: false});
     const cube = new THREE.Mesh(geometry, material);
     cube.position.x = manche.position.x;
     cube.position.y = manche.position.y;
@@ -91,6 +92,9 @@ function Balai(param) {
     }
     group.add(manche);
     group.add(cube);
+    for(i=0;i<group.children.length;i++){
+        group.children[i].castShadow = true;
+    }
     return group;
 
 }
@@ -194,8 +198,9 @@ function Pierre(param) {
     group.add(surface_haut_circle);
     group.add(endroit_pour_tenir_geometry);
     group.add(endroit_pour_tenir_geometry1);
-
-
+    for(i=0;i<group.children.length;i++){
+        group.children[i].castShadow = true;
+    }
     return group;
 }
 

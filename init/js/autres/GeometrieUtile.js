@@ -27,7 +27,6 @@ function segment(A,B,CoulHexa,epai){
  }));
  //line.computeLineDistances();
  //scene.add(line);
-    console.log(geometry.getPoints(150))
  return line;
 }
 
