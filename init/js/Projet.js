@@ -128,61 +128,12 @@ function init() {
         }
     }
 
-    //fonction qui va animer les balais qui frottent le sole
-    // function animebalai(pierre, delta, mode) {
-    //     switch (mode) {
-    //         case 1: {
-    //             console.log("aaaaaaa")
-    //             balais[0].position.y = pierre.position.y + delta;
-    //             balais[1].position.y = -balais[0].position.y;
-    //             console.log(balais[0].position.y)
-    //         }
-    //             break;
-    //         case -1: {
-    //             console.log(balais[0].position.y)
-    //             console.log("bbbbbbbb")
-    //             balais[0].position.y = pierre.position.y + delta;
-    //             balais[1].position.y = -balais[0].position.y;
-    //             time -= 0.014
-    //         }
-    //     }
-    // }
-
-    function animebalai(pierre, delta, mode) {
-        switch (mode) {
-            case 1: {
-                balais[0].position.y = delta;
-                balais[1].position.y = -balais[0].position.y;
-            }
-                break;
-            case -1: {
-                balais[0].position.y = delta;
-                balais[1].position.y = -balais[0].position.y;
-            }
-        }
-    }
-
-
-    function animeBalaisX(pierre, point) {
-        balais[0].position.x = point.x + paramBalai.longRec + pierre.taille;
-        balais[1].position.x = balais[0].position.x + paramBalai.longRec * 1.6;
-    }
-
-    function camera_suivie(camera, pierre) {
-        camera.position.x = pierre.pierre.position.x - pierre.taille - 6;
-        camera.position.y = pierre.pierre.position.y;
-        camera.position.z = 4;
-        camera.lookAt(pierre.pierre.position.x + 1, pierre.pierre.position.y, 1);
-        camera.updateProjectionMatrix();
-    }
-
     function addAndRemovePiste() {
         if (!etat_partie) {// si la partie est en cours on ne bouge replace pas le balai au point de depart
             three[0].remove(piste);// on retire la piste
             piste = piste = new Piste(paramPiste);//on creé une nouvelle piste avec les parametres du gui
             three[0].add(piste);// on ajoute la nouvelle piste a la scene
             placment_balai();
-            //placment_pierre();
         } else {
             if (alertmess) {
                 alert("Impossible partie commencé");
@@ -196,8 +147,8 @@ function init() {
     }
 
 
-    //fonction qui place la pierre en parametre au debut de la piste quelle qu'en soit sa dimension
-    function placment_pierre(pierre) {
+//fonction qui place la pierre en parametre au debut de la piste quelle qu'en soit sa dimension
+    function placement_pierre(pierre) {
         pierre.position.z = 0.0065;// place la pierre sur la piste
         pierre.position.x = piste.position.x - 0.70 * (paramPiste.longueur / 2);// place la pierre a 0.70% de la moitier de la longueur de la piste, en gros au debut de la piste
         pierre.rotation.z = (Math.PI / 2);// tourne la pierre pour que l'endroit ou l'on tient la pierre soit derriere la piste
@@ -237,19 +188,17 @@ function init() {
         }
     }
 
-    // let pi = new Pierrre(paramPierre, 1, "black");
-    // three[0].add(pi.pierre);
     var time = 0;
     var mode = 1;
     var min_balais = 0;
     var max_balais = 0;
 
     function animeBalais(pierre, point) {
-        animeBalaisX(pierre, object[1][i]);
+        animeBalaisX(pierre, point);
         max_balais = point.y + paramPierre.taille + piste.position.y + paramPiste.largeur / 6;
         min_balais = point.y;
-        camera_suivie(three[1], pierres[compteur], vectcentreMaison);
-        animebalai(pierres[compteur].pierre, time, mode);
+        camera_suivie(three[1], pierre, vectcentreMaison);
+        animebalaiY(pierre.pierre, time, mode);
         if (mode === 1) {
             time += 0.014;
             if (time >= max_balais) {
@@ -262,6 +211,27 @@ function init() {
                 mode *= (-1);
             }
         }
+    }
+    //
+    function animebalaiY(pierre, delta, mode) {
+        switch (mode) {
+            case 1: {
+                balais[0].position.y = delta;
+                balais[1].position.y = -balais[0].position.y;
+            }
+                break;
+            case -1: {
+                balais[0].position.y = delta;
+                balais[1].position.y = -balais[0].position.y;
+            }
+        }
+    }
+
+
+    function animeBalaisX(pierre, point) {
+        balais[0].position.x = point.x + paramBalai.longRec + pierre.taille;
+        balais[1].position.x = balais[0].position.x + paramBalai.longRec * 1.6;
+       // console.log(balais[0].position.x, pierre)
     }
 
 
@@ -385,7 +355,7 @@ function init() {
             }
             let pierre = pierres[compteur];
             three[0].add(pierre.pierre);
-            placment_pierre(pierre.pierre);
+            placement_pierre(pierre.pierre);
             deplacementparam(pierre);
             console.log(pierres)
             // console.log(pierres);
@@ -439,10 +409,14 @@ function init() {
 
             function lancer() {
                 if (i !== object[1].length) {
+                    pierre.lancer = true;
                     delta = clock.getDelta();
                     requestAnimationFrame(lancer);
                     pierre.deplacement(object[1][i]);
-                    animeBalais(pierre.pierre, object[1][i]);
+                    if(compteur>=1){
+                        chocDetected(pierres)
+                    }
+                    animeBalais(pierre, object[1][i]);
                     camera_suivie(three[1], pierre);
                     i++;
                 } else {
@@ -454,13 +428,14 @@ function init() {
                         pierre.distance = Math.round(vectcentreMaison.distanceTo(vectpierre) * 100) / 100;
                         messs.innerHTML = pierre.distance + " m du centre de la maison";
                     }
-                    lancer_ok_point_d_interogation = true;
+
                     placment_balai();
                     coull(pierre);
                     setTimeout(() => {
-                        camera_reset_pos(three[1], paramPiste.longueur / 100)
+                        camera_reset_pos(three[1], paramPiste.longueur / 100);lancer_ok_point_d_interogation = true;
+                        addPierreGame();
                     }, 2000);
-                    addPierreGame();
+
                 }
             }
         } else {
@@ -494,33 +469,36 @@ function init() {
         if (compteurr(pierre)) {
             let pierre_numero = -1;
             let couleur = 'black';
-            for (let i = 0; i < pierres.length; i++) {
-                if (pierres[i].distance != null) {
-                    if (pierres[i].distance < le_plus_proche) {
-                        pierre_numero = i;
-                        le_plus_proche = pierres[i].distance;
-                        couleur = pierres[i].couleur;
-                        console.log(i)
-                    } else {
-                        if (pierres[i].distance === le_plus_proche) {
-                            pierre_numero = null;
+            // la boucle va chercher la distance la plus proche du centre de la maison entre toutes les pierres
+            for (let i = 0; i < pierres.length; i++) {//on boucle sur toutes les pierres de la partie
+                if (i !== compteur-1) {//on ne compare pas les 2 memes lancers
+                    if (pierres[i].distance != null) {// si la distance n'est pas null (hors piste)
+                        if (pierres[i].distance < le_plus_proche) {
+                            pierre_numero = i;
+                            le_plus_proche = pierres[i].distance;//
+                            couleur = pierres[i].couleur;
+                            console.log(i)
+                        } else {
+                            if (pierres[i].distance === le_plus_proche) {
+                                pierre_numero = null;
+                            }
                         }
                     }
                 }
-                console.log(le_plus_proche, pierre_numero)
+                //console.log(le_plus_proche, pierre_numero)
             }
-            console.log(pierres[pierre_numero])
+            //console.log(pierres[pierre_numero])
             let tr = document.getElementsByTagName('tr');
-            for (let i = 1; i < tr.length; i++) {
+            for (let i = 1; i < tr.length; i++) {// on boucle pour changer la couleur de l'ecriture dans le tableau avec l'equipe la plus proche
                 for (let o = 1; o < 6; o++) {
                     tr[i].children[o].style.color = couleur;
                 }
             }
             message_tour();
-            if (pierre_numero !== -1&& pierre_numero !=null ) {
+            if (pierre_numero !== -1 && pierre_numero != null) {// si le lancer a été plus proche que les autres lancer :
                 mess.innerHTML += " : l'équipe n° " + pierres[pierre_numero].equipe + " est en tete avec une distance de : " + le_plus_proche + " m";
             }
-            if (pierre_numero == null) {
+            if (pierre_numero == null) {// si le lancer est hors piste
                 mess.innerHTML += " : l'équipe n°1 et n°2 sont à égalité avec une distance de : " + le_plus_proche + " m"
             }
         }
@@ -535,6 +513,7 @@ function init() {
         document.getElementById('webgl').style.borderColor = pierres[compteur].couleur;
     }
 
+    //fonction qui arrete la partie quand le compteur atteint le nombre de lancer qui vaut 9
     function arreter_partie() {
         etat_partie = false;
         console.log(partie.equipe.equipe1.points, partie.equipe.equipe2.points);
@@ -575,27 +554,16 @@ function init() {
         }
     }
 
-    function getmini(tab) {
-        let tab1 = [];
-        for (let i = 0; i < tab.length; i++) {
-            if (tab[i] !== null) {
-                tab1.push(tab[i]);
-            }
-        }
-        return Math.min(...tab1);
-    }
-
+    //fonction qui place les balais et ajoute la pierre suivante pour le prochain lancer
     function addPierreGame() {
-        placment_balai();
+        placment_balai();//place les balais
         let pierre = pierres[compteur].pierre;
-        console.log(pierre);
-        three[0].add(pierre);
-        placment_pierre(pierre);
-        deplacementparam(pierres[compteur]);
+        three[0].add(pierre);// ajout de la pierre a la scene
+        placement_pierre(pierre);//placement de la pierre sur la piste
+        deplacementparam(pierres[compteur]);//creation de la trajectoir de lancer
     }
 
 
 //######################  FIN GUI  ###########################
 
 }
-

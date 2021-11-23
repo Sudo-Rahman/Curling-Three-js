@@ -5,30 +5,38 @@ class Pierrre {
         this.couleur = couleur;
         this.taille = param.taille;
         this.distance = null;
+        this.lancer = false;
     }
 
 
     deplacementRectiligne(maisonCentre, distance) {
-        let departx = this.pierre.position.x;
-        let departy = this.pierre.position.y;
-        let points = [];
-        let arrivex = (distance / 10 * maisonCentre.x + (Math.random() < 0.5 ? -0.1 : 0.1)) * 2;
-        let arrivey = maisonCentre.y + (Math.random() < 0.5 ? -0.1 : 0.1);
+        let departx = this.pierre.position.x;//point de depart X
+        let departy = this.pierre.position.y;//point de depart Y
+        let points = [];// stockage des points
+        let arrivex = (distance / 10 * maisonCentre.x + (Math.random() < 0.5 ? -0.1 : 0.1)) * 2;// on rajoute de l'aléatoir avec random
+        let arrivey = maisonCentre.y + (Math.random() < 0.5 ? -0.1 : 0.1) * Math.random();// de meme ici
         let X = departx;
         let Y = departy;
         let i;
-        for (i = 0; i < 150; i++) {
-            points.push(new THREE.Vector3(X, Y, 0.01))
+        for (i = 0; i < 150; i++) {// creation de 150 points
+            if (i > 75 && i <= 125) {
+                if (i % 2 === 0) {
+                    points.push(new THREE.Vector3(X, Y, 0.01));
+                }
+            } if(i>125) {
+                points.push(new THREE.Vector3(X, Y, 0.01));
+            }
+            points.push(new THREE.Vector3(X, Y, 0.01));
             X += arrivex / 150;
             Y += arrivey / 150;
         }
-        let line = segment(points[0], points[149], "black", 1);
-        line.position.z = 0.01;
+        console.log(points.length)
+        let line = segment(points[0], points[points.length - 1], "black", 1);// creation de la ligne qui sera affiché dans le visuel pour montrer la trajectoire
+        line.position.z = 0.01;// on sureleve un peu pour qu'il soit visible
         return [line, points];
     }
 
     deplacementBezier(paraPiste, piste, maisonCentre, distance, intensite) {
-        console.log(distance)
         let departx = this.pierre.position.x;
         let departy = this.pierre.position.y;
         let arrivex = distance / 100 * maisonCentre.x + (Math.random() < 0.5 ? -0.1 : 0.1);
@@ -79,7 +87,6 @@ class Pierrre {
                 points.push(points2[i]);
             }
         }
-        console.log(points);
 
         return [groupe, points];
     }
