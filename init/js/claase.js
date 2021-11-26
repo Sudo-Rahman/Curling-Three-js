@@ -6,6 +6,7 @@ class Pierrre {
         this.taille = param.taille;
         this.distance = null;
         this.lancer = false;
+        this.rayon = new THREE.Vector3(this.pierre.position.x, this.pierre.position.y, this.pierre.position.z).distanceTo(this.pierre.children[2].geometry.vertices[0]);// diametre du lathe du palet arrondie car pas une sphere
     }
 
 
@@ -18,17 +19,34 @@ class Pierrre {
         let X = departx;
         let Y = departy;
         let i;
-        for (i = 0; i < 150; i++) {// creation de 150 points
-            if (i > 75 && i <= 125) {
+        for (i = 0; i < 150; i++) {// creation des points pour le deplacement rectiligne
+            if (i <= 75) {// au debut du lancer le deplacement est rapide donc l'intervalle est grande entre les points
+                points.push(new THREE.Vector3(X, Y, 0.01));
+                X += arrivex / 150;
+                Y += arrivey / 150;
+            }
+            if (i > 75 && i <= 125) {// a partir du milieu pour ralentir le deplacement on double les points et les intervalles sont plus courte aussi
                 if (i % 2 === 0) {
                     points.push(new THREE.Vector3(X, Y, 0.01));
+                    X += arrivex / 250;
+                    Y += arrivey / 250;
+                    points.push(new THREE.Vector3(X, Y, 0.01));
+                    X += arrivex / 250;
+                    Y += arrivey / 250;
+
                 }
-            } if(i>125) {
-                points.push(new THREE.Vector3(X, Y, 0.01));
             }
-            points.push(new THREE.Vector3(X, Y, 0.01));
-            X += arrivex / 150;
-            Y += arrivey / 150;
+            if (i > 125) {// a partir de 5/6 ieme du deplacement on le ralentit encore plus en ajoutant 3 fois plus de points
+                points.push(new THREE.Vector3(X, Y, 0.01));
+                X += arrivex / 350;
+                Y += arrivey / 350;
+                points.push(new THREE.Vector3(X, Y, 0.01));
+                X += arrivex / 350;
+                Y += arrivey / 350;
+                points.push(new THREE.Vector3(X, Y, 0.01));
+                X += arrivex / 350;
+                Y += arrivey / 350;
+            }
         }
         console.log(points.length)
         let line = segment(points[0], points[points.length - 1], "black", 1);// creation de la ligne qui sera affiché dans le visuel pour montrer la trajectoire
@@ -58,7 +76,7 @@ class Pierrre {
         );
 
         const points1 = curve1.getPoints(150);
-        const points2 = curve2.getPoints(150);
+        const points2 = curve2.getPoints(300);
 
         const curveObject = new THREE.Line(new THREE.BufferGeometry().setFromPoints(points1), new THREE.LineBasicMaterial({color: 0x0}));
         const curveObject1 = new THREE.Line(new THREE.BufferGeometry().setFromPoints(points2), new THREE.LineBasicMaterial({color: 0x0}));
@@ -73,20 +91,27 @@ class Pierrre {
             if (i < 75) {
                 points.push(points1[i]);
             } else {
-                if (i % 3 === 0) {
+                if (i % 1.5 === 0) {
                     points.push(points1[i]);
                 }
             }
         }
         for (i = 0; i < points2.length; i++) {
-            if (i < 50) {
+            if (i < 100) {
+                if (i % 6 === 0) {
+                    points.push(points2[i]);
+                }
+            }
+            if (i >= 100 && i <= 250) {
                 if (i % 2 === 0) {
                     points.push(points2[i]);
                 }
-            } else {
+            }
+            if (i > 250) {
                 points.push(points2[i]);
             }
         }
+        console.log(points)
 
         return [groupe, points];
     }

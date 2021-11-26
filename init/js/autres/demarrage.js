@@ -3,7 +3,7 @@ function demarage() {
     // creation de rendu et de la taille
     let rendu = new THREE.WebGLRenderer({antialias: true});
     rendu.shadowMap.enabled = true;
-    let scene = new THREE.Scene();
+    scene = new THREE.Scene();
     let camera = new THREE.PerspectiveCamera(20, window.innerWidth / window.innerHeight, 0.1, 100);
     rendu.shadowMap.enabled = true;
     rendu.shadowMapSoft = true;

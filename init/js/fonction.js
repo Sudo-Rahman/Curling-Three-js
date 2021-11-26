@@ -38,17 +38,53 @@ function chocDetected(liste_pierre) {
             for (let y = 0; y < liste_pierre.length; y++) {
                 if (liste_pierre[y].lancer !== false) {
                     if (i !== y) {
-                        let posi = new THREE.Vector2(liste_pierre[i].pierre.position.x, liste_pierre[i].pierre.position.y);
-                        let posy = new THREE.Vector2(liste_pierre[y].pierre.position.x, liste_pierre[y].pierre.position.y);
-                        let diametrei = new THREE.Vector2(liste_pierre[i].pierre.position.x,liste_pierre[i].pierre.position.y).distanceTo(new THREE.Vector2(liste_pierre[i].pierre.children[2].geometry.vertices[0].x,liste_pierre[i].pierre.children[2].geometry.vertices[0].y));
+                        let posi = new THREE.Vector3(liste_pierre[i].pierre.position.x, liste_pierre[i].pierre.position.y, liste_pierre[i].pierre.position.z);
+                        let posy = new THREE.Vector3(liste_pierre[y].pierre.position.x, liste_pierre[y].pierre.position.y, liste_pierre[y].pierre.position.z);
                         let distance = posi.distanceTo(posy);
-                        console.log(distance<=liste_pierre[i].taille+liste_pierre[y].taille, distance, diametrei)
-                        if(distance<=0.01){
+                        //console.log(distance <= liste_pierre[i].rayon + liste_pierre[y].rayon, distance, liste_pierre[i].rayon, liste_pierre[y].rayon)
+                        if (distance <= liste_pierre[i].rayon + liste_pierre[y].rayon) {
                             console.log("choc detecter");
+                            console.log(liste_pierre[i].pierre.position , liste_pierre[y].pierre.position,liste_pierre);
+                            var dir = new THREE.Vector3();
+                            dir.subVectors(posi, posy).normalize();
+                            return [true, chocanime(liste_pierre[i], dir,liste_pierre)];
                         }
                     }
                 }
+            }
+        }
+    }
+    return false;
+}
 
+function chocanime(pierre, direction,lstpierre) {
+    let x = direction.x * 0.014;
+    let y = direction.y * 0.014;
+    console.log(pierre, x, y);
+    let i = 0;
+    anime();
+
+    function anime() {
+        if (i < 35) {
+            requestAnimationFrame(anime);
+            pierre.pierre.position.x += x;
+            pierre.pierre.position.y += y;
+        }
+        i++;
+        chocDetected(lstpierre);
+        calculeDistancetoMaison(lstpierre);
+    }
+
+}
+
+function calculeDistancetoMaison(liste_pierre) {
+    for (let i = 0; i < liste_pierre.length; i++) {
+        if (liste_pierre[i].lancer !== false) {
+            if (liste_pierre[i].pierre.position.x > paramPiste.longueur / 2 + piste.position.x || liste_pierre[i].pierre.position.y > paramPiste.largeur / 2 + piste.position.y || -liste_pierre[i].pierre.position.x < -paramPiste.longueur / 2 + piste.position.x) {
+                scene.remove(liste_pierre[i].pierre);
+                liste_pierre[i].distance = null;
+            }else{
+                liste_pierre[i].distance = Math.round(vectcentreMaison.distanceTo(new THREE.Vector2(liste_pierre[i].pierre.position.x, liste_pierre[i].pierre.position.y)) * 100) / 100;
             }
         }
     }
