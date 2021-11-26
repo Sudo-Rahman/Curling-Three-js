@@ -220,16 +220,23 @@ function init() {
 
         }
         switch (paramLancer.id_lancer) {
-            case "rectiligne":
+            case "rectiligne": {
                 object = pierre.deplacementRectiligne(paramLancer.forceN * paramLancer.force_de_frottement * 5, paramLancer.balai);
                 scene.add(object[0]);
-                console.log(object)
+                //console.log(object);
+            }
                 break;
-            case "bezier":
-                console.log(paramLancer.forceN * paramLancer.force_de_frottement * 5);
+            case "bezier": {
                 object = pierre.deplacementBezier(paramLancer.forceN * paramLancer.force_de_frottement * 5, paramLancer.balai);
                 scene.add(object[0]);
-
+                //console.log(object)
+            }
+                break;
+            case "bezier2":{
+                object = pierre.deplacementBezier2(paramLancer.forceN * paramLancer.force_de_frottement * 5, paramLancer.balai);
+                scene.add(object[0]);
+                //console.log(object)
+            }
         }
     }
 
@@ -355,7 +362,7 @@ function init() {
             deplacementparam(pierres[compteur]);
         }
     });
-    guiLancer.add(paramLancer, "id_lancer", ["rectiligne", "bezier"]).name("choix lancer").onChange(function () {
+    guiLancer.add(paramLancer, "id_lancer", ["rectiligne", "bezier", "bezier2"]).name("choix lancer").onChange(function () {
         if (etat_partie && lancer_ok_point_d_interogation) {
             deplacementparam(pierres[compteur]);
         }
@@ -504,16 +511,7 @@ function init() {
             mess.style.color = "black";
         }
     }
-
-// fonction qui verifie que la liste en para ne contient que des valeurs null
-    function check_list_contains_only_null_vallues(list) {
-        let null_ou_pas = true;
-        for (let i = 0; i < list.length; i++) {
-            if (list[i] !== null) {
-                null_ou_pas = false
-            }
-        }
-    }
+    
 
 //fonction qui place les balais et ajoute la pierre suivante pour le prochain lancer
     function addPierreGame() {

@@ -11,12 +11,12 @@ class Pierrre {
     }
 
 
-    deplacementRectiligne( distance,intensite) {
+    deplacementRectiligne(distance, intensite) {
         let departx = this.pierre.position.x;//point de depart X
         let departy = this.pierre.position.y;//point de depart Y
         let points = [];// stockage des points
         let arrivex = (distance / 10 * vectcentreMaison.x + (Math.random() < 0.5 ? -0.1 : 0.1)) * 2;// on rajoute de l'aléatoir avec random
-        let arrivey = vectcentreMaison.y + (Math.random() < 0.5 ? -0.1 : 0.1) * Math.random()*intensite*10;// de meme ici
+        let arrivey = vectcentreMaison.y + (Math.random() < 0.5 ? -0.1 : 0.1) * Math.random() * intensite * 10;// de meme ici
         let X = departx;
         let Y = departy;
         let i;
@@ -49,7 +49,7 @@ class Pierrre {
                 Y += arrivey / 350;
             }
         }
-        console.log(points.length)
+        // console.log(points.length)
         let line = segment(points[0], points[points.length - 1], "black", 1);// creation de la ligne qui sera affiché dans le visuel pour montrer la trajectoire
         line.position.z = 0.01;// on sureleve un peu pour qu'il soit visible
         return [line, points];
@@ -86,35 +86,62 @@ class Pierrre {
         groupe.add(curveObject);
         groupe.add(curveObject1);
         groupe.position.z = 0.03;
-        let points = []
-        let i;
-        for (i = 0; i < points1.length; i++) {
-            if (i < 75) {
+        let points = [];
+        for (let i = 0; i < points1.length; i++) {
+            if (i % 2 === 0) {
                 points.push(points1[i]);
-            } else {
-                if (i % 1.5 === 0) {
-                    points.push(points1[i]);
-                }
             }
         }
-        for (i = 0; i < points2.length; i++) {
-            if (i < 100) {
-                if (i % 6 === 0) {
+        for (let i = 0; i < points2.length; i++) {
+            if (i < 200) {
+                if (i % 4 === 0) {
                     points.push(points2[i]);
                 }
             }
-            if (i >= 100 && i <= 250) {
+            if (i >= 200) {
                 if (i % 2 === 0) {
                     points.push(points2[i]);
                 }
             }
-            if (i > 250) {
-                points.push(points2[i]);
-            }
         }
-        console.log(points)
+        // console.log(points)
 
         return [groupe, points];
+    }
+
+    deplacementBezier2(distance, intensite) {
+        let departx = this.pierre.position.x;
+        let departy = this.pierre.position.y;
+        let arrivex = distance / 100 * vectcentreMaison.x + (Math.random() < 0.5 ? -0.1 : 0.1);
+        let arrivey = vectcentreMaison.y + (Math.random() < 0.5 ? -0.1 : 0.1);
+
+
+        const curve = new THREE.QuadraticBezierCurve(
+            new THREE.Vector2(departx, departy),
+            new THREE.Vector2(arrivex / 2, (paramPiste.largeur + piste.position.y) * intensite),
+            new THREE.Vector2(arrivex, arrivey)
+        );
+        const points1 = curve.getPoints(300);
+        const curveObject = new THREE.Line(new THREE.BufferGeometry().setFromPoints(points1), new THREE.LineBasicMaterial({color: 0x0}));
+        curveObject.position.z = 0.03;
+        let points = [];
+        for (let i = 0; i < points1.length; i++) {
+            if (i < 100) {
+                if (i % 3 === 0) {
+                    points.push(points1[i]);
+                }
+            } else {
+                if (i >= 100 && i < 250) {
+                    if (i % 2 === 0) {
+                        points.push(points1[i]);
+                    }
+                } else {
+                    points.push(points1[i]);
+                }
+            }
+        }
+        return [curveObject, points];
+
     }
 
 
