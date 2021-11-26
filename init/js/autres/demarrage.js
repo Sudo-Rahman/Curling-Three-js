@@ -4,7 +4,7 @@ function demarage() {
     let rendu = new THREE.WebGLRenderer({antialias: true});
     rendu.shadowMap.enabled = true;
     scene = new THREE.Scene();
-    let camera = new THREE.PerspectiveCamera(20, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera = new THREE.PerspectiveCamera(20, window.innerWidth / window.innerHeight, 0.1, 100);
     rendu.shadowMap.enabled = true;
     rendu.shadowMapSoft = true;
     rendu.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -13,8 +13,8 @@ function demarage() {
     cameraLumiere(scene, camera);
     //lumiere(scene);
     repere(scene);
-    let light1 = new THREE.DirectionalLight(0xFFFFFF, 1,100); //desklamp spotlight
-    light1.position.set(15, 10, 20);
+    let light1 = new THREE.DirectionalLight(0xFFFFFF, 0.5,100);
+    light1.position.set(-25, 25, 80);
     light1.target.position.set(0, 0, 0);
     light1.shadow.mapSize.width = 2000;
     light1.shadow.mapSize.height = 2000;
@@ -29,9 +29,20 @@ function demarage() {
     // let helper = new THREE.CameraHelper(light1.shadow.camera);
     // scene.add(helper);
     // console.log(helper);
+    let light = new THREE.DirectionalLight(0xFFFFFF, 0.5,100);
+    light.position.set(15, 0, 5);
+    light.target.position.set(0, 0, 0);
+    light.shadow.mapSize.width = 2000;
+    light.shadow.mapSize.height = 2000;
+    // light.castShadow = true;
+    light.shadow.camera.top = side;
+    light.shadow.camera.bottom = -side;
+    light.shadow.camera.left = side;
+    light.shadow.camera.right = -side;
+    scene.add(light);
+    scene.add(light.target);
+    scene.add(new THREE.AmbientLight(0xFFFFFF, 0.3));
 
-    const light = new THREE.AmbientLight( 0x404040,0.5 ); // soft white light
-    scene.add( light );
 
 
     var axes = new THREE.AxesHelper(1);
@@ -57,7 +68,7 @@ function demarage() {
     //animate();//fin deplacement avec souris
     controls.rotateSpeed = 1;
 
-    camera_reset_pos(camera, 0);
+    camera_reset_pos(0);
     //tracage du repere
     repere(scene);
 
@@ -88,6 +99,5 @@ function demarage() {
         rendu.render(scene, camera);
     }
 
-    return [scene, camera, rendu];
 }
 

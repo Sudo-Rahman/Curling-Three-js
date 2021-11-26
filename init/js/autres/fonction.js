@@ -57,7 +57,7 @@ function demarage() {
     //animate();//fin deplacement avec souris
     controls.rotateSpeed = 1;
 
-    camera_reset_pos(camera, 0);
+    camera_reset_pos(0);
     //tracage du repere
     repere(scene);
 
@@ -91,7 +91,7 @@ function demarage() {
     return [scene, camera, rendu];
 }
 
-function camera_reset_pos(camera, zoom) {
+function camera_reset_pos( zoom) {
     camera.zoom = 0.5 - zoom;
     console.log(zoom)
     camera.position.x = 0;

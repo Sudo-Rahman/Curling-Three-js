@@ -3,3 +3,5 @@ var vectcentreMaison = new THREE.Vector2(0, 0); // var qui stock les coordonné 
 var paramPiste;
 var piste;
 var scene;
+var camera;
+var pierres = []; // liste qui va stocker les pierres des 2 equipes

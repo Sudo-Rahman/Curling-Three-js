@@ -55,6 +55,8 @@ function Piste(param) {
     group.add(circle4);
     for(let i=0;i<group.children.length;i++){
         group.children[i].receiveShadow = true;
+        group.children[i].material.emissive = 0x0;
+        group.children[i].material.shininess = 100;
     }
     return group;
 }
@@ -94,6 +96,7 @@ function Balai(param) {
     group.add(cube);
     for(i=0;i<group.children.length;i++){
         group.children[i].castShadow = true;
+
     }
     return group;
 

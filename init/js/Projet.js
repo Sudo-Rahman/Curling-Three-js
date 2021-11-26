@@ -1,8 +1,8 @@
 function init() {
-    var three = demarage(); // var qui contient la scene et la camera
-    three[1].updateProjectionMatrix();
+    demarage(); // var qui contient la scene et la camera
+    camera.updateProjectionMatrix();
     var gui = new dat.GUI(); // initialisation du gui
-    guicamera(gui, three[1]); //ajoute au gui les parametres de la camera
+    guicamera(gui); //ajoute au gui les parametres de la camera
 
 
     //####################### PARAMETRE DES OBJETS ######################
@@ -53,18 +53,6 @@ function init() {
 
     // parametre de la partie
     let partie = new function () {
-        this.equipe = {
-            equipe1: {
-                coul: "#1252d5",// couleur par defaut de l'equipe
-                pierres: [],//list qui contient les pierre de l'equipe
-                points: [],//liste qui va repertorier la distance des pierre de l'equipe
-            },
-            equipe2: {
-                coul: "#ffffff",
-                pierres: [],
-                points: [],
-            },
-        };
         this.choixequipe = 1;// variable pour selectionner l'equipe et changer les parametres de la pierre de l'equipe selectionné dans le gui
         this.commencer = function () {//fonction qui va lancer la partie
         };
@@ -76,10 +64,8 @@ function init() {
 
     //initialisation des pierres des equipes par defaut
     for (let y = 0; y < 5; y++) {
-        partie.equipe.equipe1.pierres.push(new Pierrre(paramPierre, 1, partie.equipe.equipe1.coul));
-        paramPierre.coulCentre = partie.equipe.equipe2.coul;
-        partie.equipe.equipe2.pierres.push(new Pierrre(paramPierre, 2, partie.equipe.equipe2.coul));
-        paramPierre.coulCentre = partie.equipe.equipe1.coul;
+        pierres.push(new Pierrre(paramPierre, 1, "#1252d5"));
+        pierres.push(new Pierrre(paramPierre, 2, "#ffffff"));
     }
     //####################### fin PARAMETRE Phisiques des lancers ######################
 
@@ -88,11 +74,11 @@ function init() {
 
     //objets
     piste = new Piste(paramPiste);// creation de la piste
-    three[0].add(piste);// ajout de la piste dans la scene
+    scene.add(piste);// ajout de la piste dans la scene
 
 
     var balais = [new Balai(paramBalai), new Balai(paramBalai)];// on creé deux balais
-    three[0].add(balais[0], balais[1]);
+    scene.add(balais[0], balais[1]);
     placment_balai();
 
     //fonction qui place les balais a leur point de depart
@@ -109,9 +95,9 @@ function init() {
     //fonction qui sert a ne pas faire des repetitions / il reconstruit les balais en fonctions des parametre du gui
     function addAndRemoveBalais() {
         if (!etat_partie) {// si la partie est en cours on ne bouge replace pas le balai au point de depart
-            three[0].remove(balais[0], balais[1]);// on enleve le balai de la scene
+            scene.remove(balais[0], balais[1]);// on enleve le balai de la scene
             balais = [new Balai(paramBalai), new Balai(paramBalai)];
-            three[0].add(balais[0], balais[1]);// on l'ajoute a la scene
+            scene.add(balais[0], balais[1]);// on l'ajoute a la scene
             placment_balai();
         } else {//sinon on indique que la partie est en cours
             if (alertmess) {
@@ -127,9 +113,9 @@ function init() {
 
     function addAndRemovePiste() {
         if (!etat_partie) {// si la partie est en cours on ne bouge replace pas le balai au point de depart
-            three[0].remove(piste);// on retire la piste
+            scene.remove(piste);// on retire la piste
             piste = piste = new Piste(paramPiste);//on creé une nouvelle piste avec les parametres du gui
-            three[0].add(piste);// on ajoute la nouvelle piste a la scene
+            scene.add(piste);// on ajoute la nouvelle piste a la scene
             placment_balai();
         } else {
             if (alertmess) {
@@ -154,22 +140,17 @@ function init() {
     //fonction qui initialise les pierres d'une equipe en fonction des parametres choisies dans le gui
     function addAndRemovePierres() {
         if (!etat_partie) {// on regarde que la partie n'a pas commencé
-            let pierres = [];// on creé une liste vierge
             switch (parseInt(partie.choixequipe)) {//on fait un parsint car pour le nombre 2 le gui renvoie un string
                 case 1: {//equipe 1 selectionné
-                    partie.equipe.equipe1.coul = paramPierre.coulCentre;
                     for (let i = 0; i < 5; i++) {//on boucle 5 fois
-                        pierres.push(new Pierrre(paramPierre, 1, partie.equipe.equipe1.coul));// on ajoute les pierres a la liste
+                        pierres[i * 2] = new Pierrre(paramPierre, 1, paramPierre.coulCentre);// on ajoute les pierres a la liste
                     }
-                    partie.equipe.equipe1.pierres = pierres; // on affecte la liste de pierre a l'equipe 1
                 }
                     break;
                 case 2: {//equipe 2 selectionné
-                    partie.equipe.equipe2.coul = paramPierre.coulCentre;
                     for (let i = 0; i < 5; i++) {//on boucle 5 fois
-                        pierres.push(new Pierrre(paramPierre, 2, partie.equipe.equipe2.coul));// on ajoute les pierres a la liste
+                        pierres[i * 2 + 1] = new Pierrre(paramPierre, 2, paramPierre.coulCentre);// on ajoute les pierres a la liste
                     }
-                    partie.equipe.equipe2.pierres = pierres;
                 }
                     break;
             }
@@ -195,7 +176,6 @@ function init() {
         animeBalaisX(pierre, point);
         max_balais = point.y + paramPierre.taille + piste.position.y + paramPiste.largeur / 6;
         min_balais = point.y;
-        camera_suivie(three[1], pierre, vectcentreMaison);
         animebalaiY(pierre.pierre, time, mode);
         if (mode === 1) {
             time += 0.014;
@@ -236,19 +216,19 @@ function init() {
 
     function deplacementparam(pierre) {
         if (object != null) {
-            three[0].remove(object[0]);
+            scene.remove(object[0]);
 
         }
         switch (paramLancer.id_lancer) {
             case "rectiligne":
-                object = pierre.deplacementRectiligne(vectcentreMaison, paramLancer.forceN * paramLancer.force_de_frottement * 5);
-                three[0].add(object[0]);
+                object = pierre.deplacementRectiligne(paramLancer.forceN * paramLancer.force_de_frottement * 5, paramLancer.balai);
+                scene.add(object[0]);
                 console.log(object)
                 break;
             case "bezier":
                 console.log(paramLancer.forceN * paramLancer.force_de_frottement * 5);
-                object = pierre.deplacementBezier(paramPiste, piste, vectcentreMaison, paramLancer.forceN * paramLancer.force_de_frottement * 5, paramLancer.balai);
-                three[0].add(object[0]);
+                object = pierre.deplacementBezier(paramLancer.forceN * paramLancer.force_de_frottement * 5, paramLancer.balai);
+                scene.add(object[0]);
 
         }
     }
@@ -259,7 +239,6 @@ function init() {
 
     // ##################### DEBUT Partie ####################
 
-    var pierres = []; // liste qui va stocker les pierres des 2 equipes
     var compteur = 0; // compteur qui servira pour gerer les tours
     var alertmess = true; // var initialisé a vrai qui sert a ne pas spamé d'alert
     var mess = document.getElementById("mess"); // var qui stock l'element html mess ou sera indiqué le tour d'une equipe et qui annoncera le gagnant
@@ -282,9 +261,9 @@ function init() {
     });
     guiPiste.addColor(paramPiste, "coul").onChange(function () {//modification de la largeur de la piste
         if (!etat_partie) {// si la partie est en cours on ne bouge replace pas le balai au point de depart
-            three[0].remove(piste);
+            scene.remove(piste);
             piste = piste = new Piste(paramPiste);
-            three[0].add(piste);
+            scene.add(piste);
             placment_balai();
         }
     });
@@ -338,19 +317,15 @@ function init() {
     guiPartie.add(partie, "commencer").name("Commencer la partie").onChange(function () {
         if (!etat_partie) {
             vectcentreMaison = new THREE.Vector2(paramPiste.longueur / 2 + piste.position.x - paramPiste.longueur / 10, piste.position.y);
-            mess.innerHTML = "Lancer " + (compteur + 1) + " : tour de l'equipe 1";
-            mess.style.color = partie.equipe.equipe1.coul;
-            webgl.style.borderColor = partie.equipe.equipe1.coul;
+            mess.innerHTML = "Lancer 1 de l'equipe 1";
+            mess.style.color = pierres[0].couleur;
+            webgl.style.borderColor = pierres[0].couleur;
             let tr = document.getElementsByTagName('tr');
-            tr[1].children[0].style.color = partie.equipe.equipe1.coul;
-            tr[2].children[0].style.color = partie.equipe.equipe2.coul;
+            tr[1].children[0].style.color = pierres[0].couleur;
+            tr[2].children[0].style.color = pierres[1].couleur;
             etat_partie = true;
-            for (let i = 0; i < 5; i++) {// on ajoutes toutes les pierres des 2 equipes dans la var pierres creéé dans la section Partie
-                pierres.push(partie.equipe.equipe1.pierres[i]);
-                pierres.push(partie.equipe.equipe2.pierres[i]);
-            }
             let pierre = pierres[compteur];
-            three[0].add(pierre.pierre);
+            scene.add(pierre.pierre);
             placement_pierre(pierre.pierre);
             deplacementparam(pierre);
             console.log(pierres)
@@ -375,6 +350,11 @@ function init() {
             deplacementparam(pierres[compteur]);
         }
     });
+    guiLancer.add(paramLancer, "balai", 0.1, 1).name("point de controle").onChange(function () {
+        if (etat_partie && lancer_ok_point_d_interogation) {
+            deplacementparam(pierres[compteur]);
+        }
+    });
     guiLancer.add(paramLancer, "id_lancer", ["rectiligne", "bezier"]).name("choix lancer").onChange(function () {
         if (etat_partie && lancer_ok_point_d_interogation) {
             deplacementparam(pierres[compteur]);
@@ -382,7 +362,7 @@ function init() {
     });
     guiLancer.add(paramLancer, "lancer").onChange(function () {//modification de la largeur de la piste
         if (etat_partie && lancer_ok_point_d_interogation) {
-            three[0].remove(object[0]);
+            scene.remove(object[0]);
             time = 0;
             let pierre = pierres[compteur];
             var clock = new THREE.Clock();
@@ -397,7 +377,7 @@ function init() {
                     delta = clock.getDelta();
                     pierre.deplacement(object[1][i]);
                     if (compteur >= 1) {// pour la premiere pierre a lancer on ne regarde pas si il y a choc ou pas car ya pas d'autre pierre
-                        if (!chocDetected(pierres)) {//si on ne detecte pas de choc on continue l'animation
+                        if (!chocDetected(paramLancer.forceN)) {//si on ne detecte pas de choc on continue l'animation
                             requestAnimationFrame(lancer);
                         } else {//si ya choc, la fonction chocDetected lance appelle une autre fonction pour realiser la ou les chocs
                             lancerend();
@@ -407,7 +387,7 @@ function init() {
                     }
                     if (balais[1].position.x < vectcentreMaison.x) {// on regarge que les balaise n'atteigne pas en x le centre de la maison
                         animeBalais(pierre, object[1][i]);
-                        camera_suivie(three[1], pierre);
+                        camera_suivie(pierre);
                     } else {// si les balais atteigne en x le centre de la maison ils se mettent sur le coter de la piste
                         balais[0].position.y = pierre.pierre.position.y + 5 * pierre.taille;
                         balais[1].position.y = pierre.pierre.position.y + 5 * pierre.taille;
@@ -427,7 +407,7 @@ function init() {
     function lancerend() {
         setTimeout(() => {//on fait attendre 2 seconde avant de recalculer les pos des pierres et on reset la pos de la camera
             compteurr();// on increment le compteur de lancer de pierre
-            camera_reset_pos(three[1], paramPiste.longueur / 100);
+            camera_reset_pos(paramPiste.longueur / 100);
             lancer_ok_point_d_interogation = true;
         }, 2000);
     }
@@ -449,7 +429,7 @@ function init() {
     }
 
     function actualisationDistancetoMaison() {
-        calculeDistancetoMaison(pierres);
+        calculeDistancetoMaison();
         let min = 100000;
         let pierre = null;
         let pierrereturn = null;
@@ -539,7 +519,7 @@ function init() {
     function addPierreGame() {
         placment_balai();//place les balais
         let pierre = pierres[compteur].pierre;
-        three[0].add(pierre);// ajout de la pierre a la scene
+        scene.add(pierre);// ajout de la pierre a la scene
         placement_pierre(pierre);//placement de la pierre sur la piste
         deplacementparam(pierres[compteur]);//creation de la trajectoir de lancer
     }

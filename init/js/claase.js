@@ -11,12 +11,12 @@ class Pierrre {
     }
 
 
-    deplacementRectiligne(maisonCentre, distance) {
+    deplacementRectiligne( distance,intensite) {
         let departx = this.pierre.position.x;//point de depart X
         let departy = this.pierre.position.y;//point de depart Y
         let points = [];// stockage des points
-        let arrivex = (distance / 10 * maisonCentre.x + (Math.random() < 0.5 ? -0.1 : 0.1)) * 2;// on rajoute de l'aléatoir avec random
-        let arrivey = maisonCentre.y + (Math.random() < 0.5 ? -0.1 : 0.1) * Math.random();// de meme ici
+        let arrivex = (distance / 10 * vectcentreMaison.x + (Math.random() < 0.5 ? -0.1 : 0.1)) * 2;// on rajoute de l'aléatoir avec random
+        let arrivey = vectcentreMaison.y + (Math.random() < 0.5 ? -0.1 : 0.1) * Math.random()*intensite*10;// de meme ici
         let X = departx;
         let Y = departy;
         let i;
@@ -55,24 +55,24 @@ class Pierrre {
         return [line, points];
     }
 
-    deplacementBezier(paraPiste, piste, maisonCentre, distance, intensite) {
+    deplacementBezier(distance, intensite) {
         let departx = this.pierre.position.x;
         let departy = this.pierre.position.y;
-        let arrivex = distance / 100 * maisonCentre.x + (Math.random() < 0.5 ? -0.1 : 0.1);
-        let arrivey = maisonCentre.y + (Math.random() < 0.5 ? -0.1 : 0.1);
+        let arrivex = distance / 100 * vectcentreMaison.x + (Math.random() < 0.5 ? -0.1 : 0.1);
+        let arrivey = vectcentreMaison.y + (Math.random() < 0.5 ? -0.1 : 0.1);
         let milieux = (departx + arrivex) / 2;
         let milieuy = (departy + arrivey) / 2;
 
 
         const curve1 = new THREE.QuadraticBezierCurve(
             new THREE.Vector2(departx, departy),
-            new THREE.Vector2(milieux / 2, (paraPiste.largeur + piste.position.y) * intensite),
+            new THREE.Vector2(milieux / 2, (paramPiste.largeur + piste.position.y) * intensite),
             new THREE.Vector2(milieux, milieuy)
         );
 
         const curve2 = new THREE.QuadraticBezierCurve(
             new THREE.Vector2(milieux, milieuy),
-            new THREE.Vector2(milieux * 1.5, -(paraPiste.largeur + piste.position.y) * intensite),
+            new THREE.Vector2(milieux * 1.5, -(paramPiste.largeur + piste.position.y) * intensite),
             new THREE.Vector2(arrivex, arrivey)
         );
 

@@ -1,4 +1,4 @@
-function camera_reset_pos(camera, zoom) {//fonction qui repositionne la camera apres un lancer
+function camera_reset_pos( zoom) {//fonction qui repositionne la camera apres un lancer
     camera.zoom = 0.5 - zoom;
     console.log(zoom)
     camera.position.x = 0;
@@ -9,7 +9,7 @@ function camera_reset_pos(camera, zoom) {//fonction qui repositionne la camera a
 }
 
 //fonction qui fait en sorte que la camera suive la pierre pendant le lancer
-function camera_suivie(camera, pierre) {
+function camera_suivie( pierre) {
     camera.position.x = pierre.pierre.position.x - pierre.taille - 6;
     camera.position.y = pierre.pierre.position.y;
     camera.position.z = 4;
@@ -32,22 +32,22 @@ function getmini(tab) {
 
 
 // fonction qiui detecte si il y a un choc entre les pierres
-function chocDetected(liste_pierre) {
-    for (let i = 0; i < liste_pierre.length; i++) {
-        if (liste_pierre[i].lancer !== false && !liste_pierre[i].horsPiste) {
-            for (let y = 0; y < liste_pierre.length; y++) {
-                if (liste_pierre[y].lancer !== false && !liste_pierre[y].horsPiste) {
+function chocDetected(force) {
+    for (let i = 0; i < pierres.length; i++) {
+        if (pierres[i].lancer !== false && !pierres[i].hors_piste) {
+            for (let y = 0; y < pierres.length; y++) {
+                if (pierres[y].lancer !== false && !pierres[y].hors_piste) {
                     if (i !== y) {
-                        let posi = new THREE.Vector3(liste_pierre[i].pierre.position.x, liste_pierre[i].pierre.position.y, liste_pierre[i].pierre.position.z);
-                        let posy = new THREE.Vector3(liste_pierre[y].pierre.position.x, liste_pierre[y].pierre.position.y, liste_pierre[y].pierre.position.z);
+                        let posi = new THREE.Vector3(pierres[i].pierre.position.x, pierres[i].pierre.position.y, pierres[i].pierre.position.z);
+                        let posy = new THREE.Vector3(pierres[y].pierre.position.x, pierres[y].pierre.position.y, pierres[y].pierre.position.z);
                         let distance = posi.distanceTo(posy);
                         //console.log(distance <= liste_pierre[i].rayon + liste_pierre[y].rayon, distance, liste_pierre[i].rayon, liste_pierre[y].rayon)
-                        if (distance <= liste_pierre[i].rayon + liste_pierre[y].rayon) {
+                        if (distance < pierres[i].rayon + pierres[y].rayon) {
                             console.log("choc detecter");
-                            console.log(liste_pierre[i].pierre.position, liste_pierre[y].pierre.position, liste_pierre);
-                            var dir = new THREE.Vector3();
-                            dir.subVectors(posi, posy).normalize();
-                            return [true, chocanime(liste_pierre[i], dir, liste_pierre)];
+                            console.log(pierres[i].pierre.position, pierres[y].pierre.position, pierres);
+                            var dir = new THREE.Vector3().normalize();
+                            dir.subVectors(posi, posy);
+                            return [true, chocanime(pierres[i], dir,force)];
                         }
                     }
                 }
@@ -57,40 +57,36 @@ function chocDetected(liste_pierre) {
     return false;
 }
 
-function chocanime(pierre, direction, lstpierre) {
+function chocanime(pierre, direction,force) {
     let x = direction.x * 0.014;
     let y = direction.y * 0.014;
-    console.log(pierre, x, y);
+    console.log(pierre, x, y,Math.round(force*2));
     let i = 0;
     anime();
 
     function anime() {
-        if (i < 35) {
+        if (i < Math.round(force*2)) {
             requestAnimationFrame(anime);
             pierre.pierre.position.x += x;
             pierre.pierre.position.y += y;
         }
         i++;
-        chocDetected(lstpierre);
-        calculeDistancetoMaison(lstpierre);
+        chocDetected(force);
+        calculeDistancetoMaison();
     }
 
 }
 
-function calculeDistancetoMaison(liste_pierre) {
-    for (let i = 0; i < liste_pierre.length; i++) {
-        if (liste_pierre[i].lancer) {
-            if (liste_pierre[i].pierre.position.x > paramPiste.longueur / 2 + piste.position.x || liste_pierre[i].pierre.position.y > paramPiste.largeur / 2 + piste.position.y || -liste_pierre[i].pierre.position.x < -paramPiste.longueur / 2 + piste.position.x) {
-                scene.remove(liste_pierre[i].pierre);
-                liste_pierre[i].distance = null;
-                liste_pierre[i].hors_piste = true;
-                console.log("je suis la ")
-
+function calculeDistancetoMaison() {
+    for (let i = 0; i < pierres.length; i++) {
+        if (pierres[i].lancer) {
+            if (pierres[i].pierre.position.x > paramPiste.longueur / 2 + piste.position.x || pierres[i].pierre.position.y > paramPiste.largeur / 2 + piste.position.y || -pierres[i].pierre.position.x < -paramPiste.longueur / 2 + piste.position.x) {
+                scene.remove(pierres[i].pierre);
+                pierres[i].distance = null;
+                pierres[i].hors_piste = true;
             } else {
-                console.log("bbbb")
-                liste_pierre[i].distance = Math.round(vectcentreMaison.distanceTo(new THREE.Vector2(liste_pierre[i].pierre.position.x, liste_pierre[i].pierre.position.y)) * 100) / 100;
+                pierres[i].distance = Math.round(vectcentreMaison.distanceTo(new THREE.Vector2(pierres[i].pierre.position.x, pierres[i].pierre.position.y)) * 100) / 100;
             }
         }
     }
-    console.log(liste_pierre)
 }

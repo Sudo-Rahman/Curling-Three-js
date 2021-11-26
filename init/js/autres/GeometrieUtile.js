@@ -97,7 +97,7 @@ function afficheVecteur(V,nom,lieu){
  document.getElementById(lieu).innerHTML+=mes;
 }
 
-function guicamera(gui, camera){
+function guicamera(gui){
 
     let vect = new THREE.Vector3(0, 0, 0);
     // ajout du menu dans le GUI
