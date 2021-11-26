@@ -6,6 +6,7 @@ class Pierrre {
         this.taille = param.taille;
         this.distance = null;
         this.lancer = false;
+        this.hors_piste = false;
         this.rayon = new THREE.Vector3(this.pierre.position.x, this.pierre.position.y, this.pierre.position.z).distanceTo(this.pierre.children[2].geometry.vertices[0]);// diametre du lathe du palet arrondie car pas une sphere
     }
 

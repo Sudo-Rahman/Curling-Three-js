@@ -153,9 +153,9 @@ function init() {
 
     //fonction qui initialise les pierres d'une equipe en fonction des parametres choisies dans le gui
     function addAndRemovePierres() {
-        if (!etat_partie) {// on regarle que la partie n'est pas commencé
+        if (!etat_partie) {// on regarde que la partie n'a pas commencé
             let pierres = [];// on creé une liste vierge
-            switch (partie.choixequipe) {
+            switch (parseInt(partie.choixequipe)) {//on fait un parsint car pour le nombre 2 le gui renvoie un string
                 case 1: {//equipe 1 selectionné
                     partie.equipe.equipe1.coul = paramPierre.coulCentre;
                     for (let i = 0; i < 5; i++) {//on boucle 5 fois
@@ -171,6 +171,7 @@ function init() {
                     }
                     partie.equipe.equipe2.pierres = pierres;
                 }
+                    break;
             }
             // console.log(partie.equipe);
         } else {// si la partie a commencé on ne peut pas changer les params des pierres
@@ -383,18 +384,7 @@ function init() {
         if (etat_partie && lancer_ok_point_d_interogation) {
             three[0].remove(object[0]);
             time = 0;
-            let messs = "";
             let pierre = pierres[compteur];
-            switch (pierre.equipe) {
-                case 1: {
-                    messs = document.getElementById("equipe1").getElementsByTagName('td')[compteur / 2 + 1];
-                }
-                    break;
-                case 2: {
-                    messs = document.getElementById("equipe2").getElementsByTagName('td')[parseInt(compteur / 2) + 1];
-
-                }
-            }
             var clock = new THREE.Clock();
             var delta = null;
             let i = 0;
@@ -410,7 +400,7 @@ function init() {
                         if (!chocDetected(pierres)) {//si on ne detecte pas de choc on continue l'animation
                             requestAnimationFrame(lancer);
                         } else {//si ya choc, la fonction chocDetected lance appelle une autre fonction pour realiser la ou les chocs
-                            lancerend(pierre);
+                            lancerend();
                         }
                     } else {
                         requestAnimationFrame(lancer);
@@ -424,8 +414,7 @@ function init() {
                     }
                     i++;
                 } else {//si pas de choc sur le lancer
-                    lancerend(pierre);
-                    message_tour();
+                    lancerend();
                 }
             }
         } else {
@@ -435,42 +424,35 @@ function init() {
     });
 
     //fonction qui se lance a la fin d'un lancer, il reactualise les positions des peirres des scores, reinitialisation de la position de la camera
-    function lancerend(pierre) {
-        placment_balai();// on replace les balais
-        compteurr(pierre);// on increment le compteur de lancer de pierre
-        // coull(pierre);
+    function lancerend() {
         setTimeout(() => {//on fait attendre 2 seconde avant de recalculer les pos des pierres et on reset la pos de la camera
+            compteurr();// on increment le compteur de lancer de pierre
             camera_reset_pos(three[1], paramPiste.longueur / 100);
             lancer_ok_point_d_interogation = true;
-            addPierreGame();
-            calculeDistancetoMaison(pierres);
-            actualisationDistancetoMaison();
         }, 2000);
     }
 
-    function compteurr(pierre) {
-        switch (pierre.equipe) {
-            case 1 :
-                partie.equipe.equipe1.points.push(pierre.distance);
-                break;
-            case 2 :
-                partie.equipe.equipe2.points.push(pierre.distance);
-                break;
-        }
+    function compteurr() {
         if (compteur === 9) {
             arreter_partie();
+            placment_balai();
             return false;
         } else {
             compteur++;
-            console.log(compteur)
+            console.log(compteur);
+            actualisationDistancetoMaison();
+            addPierreGame();
+            message_tour();
             return true;
         }
 
     }
 
     function actualisationDistancetoMaison() {
+        calculeDistancetoMaison(pierres);
         let min = 100000;
         let pierre = null;
+        let pierrereturn = null;
         let tr = document.getElementsByTagName('tr');
         for (let i = 1; i < tr.length; i++) {// on boucle pour changer la couleur de l'ecriture dans le tableau avec l'equipe la plus proche
             for (let o = 1; o < 6; o++) {
@@ -479,28 +461,31 @@ function init() {
                 } else {
                     pierre = pierres[(o * 2) - 1];
                 }
-                if (pierre.distance != null) {
-                    tr[i].children[o].innerHTML = pierre.distance + " m du centre de la maison";
-                    if (pierre.distance < min) {
-                        min = pierre.distance;
-                        console.log(pierre)
-                        coloriage(pierre.couleur);
-                    }
-                    if (pierre.distance === min) {
-                        pierre = new Pierrre(paramPierre, -1, "black");
-                        pierre.distance = min;
-                    }
+                if (pierre.hors_piste) {
+                    tr[i].children[o].innerHTML = "Hors piste";
                 } else {
-                    if (pierre.lancer === true) {
-                        tr[i].children[o].innerHTML = "Hors piste";
+                    if (pierre.distance != null) {
+                        tr[i].children[o].innerHTML = pierre.distance + " m du centre de la maison";
+                        if (pierre.distance < min) {
+                            min = pierre.distance;
+                            console.log(pierre)
+                            coloriage(pierre.couleur);
+                            pierrereturn = pierre;
+                        } else {
+                            if (pierre.distance === min) {
+                                pierrereturn = new Pierrre(paramPierre, -1, "black");
+                                pierrereturn.distance = min;
+                            }
+                        }
                     }
                 }
             }
         }
-        return pierre;
+
+        return pierrereturn;
     }
 
-    //fonction qui met le texte a la couleur de l'equique qui gagne
+//fonction qui met le texte a la couleur de l'equique qui gagne
     function coloriage(coul) {
         let tr = document.getElementsByTagName('tr');
         for (let i = 1; i < tr.length; i++) {// on boucle pour changer la couleur de l'ecriture dans le tableau avec l'equipe la plus proche
@@ -513,15 +498,20 @@ function init() {
 
 // fonction qui actualise le message de la page html pour les tours
     function message_tour() {
+        let pierre = actualisationDistancetoMaison();
         mess.innerHTML = "Lancer " + (parseInt(compteur / 2) + 1) + " de l'equipe " + (compteur % 2 + 1);
         mess.style.color = pierres[compteur].couleur;
         document.getElementById('webgl').style.borderColor = pierres[compteur].couleur;
+        if (pierre != null && pierre.equipe !== -1) {
+            mess.innerHTML += " : L'équipe n° " + pierre.equipe + " est en tete avec un distance de " + pierre.distance + " m du centre de la maison";
+        }
     }
 
-    //fonction qui arrete la partie quand le compteur atteint le nombre de lancer qui vaut 9
+//fonction qui arrete la partie quand le compteur atteint le nombre de lancer qui vaut 9
     function arreter_partie() {
         etat_partie = false;
         let pierre = actualisationDistancetoMaison();
+        console.log(pierre)
         if (pierre != null) {
             if (pierre.equipe === -1) {
                 mess.innerHTML = "Partie terminé avec égalité entre les 2 equipes et une distance de " + pierre.distance;
@@ -545,7 +535,7 @@ function init() {
         }
     }
 
-    //fonction qui place les balais et ajoute la pierre suivante pour le prochain lancer
+//fonction qui place les balais et ajoute la pierre suivante pour le prochain lancer
     function addPierreGame() {
         placment_balai();//place les balais
         let pierre = pierres[compteur].pierre;
