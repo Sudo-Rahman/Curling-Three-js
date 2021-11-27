@@ -1,13 +1,13 @@
 class Pierrre {
     constructor(param, equipe, couleur) {
-        this.equipe = equipe;
-        this.pierre = new Pierre(param);
-        this.couleur = couleur;
-        this.taille = param.taille;
-        this.distance = null;
-        this.lancer = false;
-        this.hors_piste = false;
-        this.rayon = new THREE.Vector3(this.pierre.position.x, this.pierre.position.y, this.pierre.position.z).distanceTo(this.pierre.children[2].geometry.vertices[0]);// diametre du lathe du palet arrondie car pas une sphere
+        this.equipe = equipe;//a quelle equipe apartient la pierre
+        this.pierre = new Pierre(param);// creation de la pierre physique
+        this.couleur = couleur;// couleur central de la pierre
+        this.taille = param.taille;// modificateur de la taille de la pierre
+        this.distance = null;// distance a la maison
+        this.lancer = false;// la pierre a été lancer ou pas ?
+        this.hors_piste = false;// la pierre est-il hors piste ?
+        this.rayon = new THREE.Vector3(this.pierre.position.x, this.pierre.position.y, this.pierre.position.z).distanceTo(this.pierre.children[2].geometry.vertices[0]);// rayon du lathe du palet mais comme ce n'est pas une sphere parfaite c'est une aproximation
     }
 
 
@@ -16,7 +16,7 @@ class Pierrre {
         let departy = this.pierre.position.y;//point de depart Y
         let points = [];// stockage des points
         let arrivex = (distance / 10 * vectcentreMaison.x + (Math.random() < 0.5 ? -0.1 : 0.1)) * 2;// on rajoute de l'aléatoir avec random
-        let arrivey = vectcentreMaison.y + (Math.random() < 0.5 ? -0.1 : 0.1) * Math.random() * intensite * 10;// de meme ici
+        let arrivey = vectcentreMaison.y +  intensite * 3;
         let X = departx;
         let Y = departy;
         let i;
@@ -63,30 +63,34 @@ class Pierrre {
         let milieux = (departx + arrivex) / 2;
         let milieuy = (departy + arrivey) / 2;
 
-
+        // creation de la premiere courbe de beziers
         const curve1 = new THREE.QuadraticBezierCurve(
             new THREE.Vector2(departx, departy),
             new THREE.Vector2(milieux / 2, (paramPiste.largeur + piste.position.y) * intensite),
-            new THREE.Vector2(milieux, milieuy)
+            new THREE.Vector2(milieux, milieuy)//jointure G1
         );
 
         const curve2 = new THREE.QuadraticBezierCurve(
-            new THREE.Vector2(milieux, milieuy),
-            new THREE.Vector2(milieux * 1.5, -(paramPiste.largeur + piste.position.y) * intensite),
+            new THREE.Vector2(milieux, milieuy),// jointure G1
+            new THREE.Vector2(milieux * 1.5, -(paramPiste.largeur + piste.position.y) * intensite),//point de controle aligné avec la joiture G1 et le point de controle de la premiere courbe de bezier
             new THREE.Vector2(arrivex, arrivey)
         );
 
+        // creation des points
         const points1 = curve1.getPoints(150);
         const points2 = curve2.getPoints(300);
 
+        // creations des lignes qui seront afficher a l'ecran
         const curveObject = new THREE.Line(new THREE.BufferGeometry().setFromPoints(points1), new THREE.LineBasicMaterial({color: 0x0}));
         const curveObject1 = new THREE.Line(new THREE.BufferGeometry().setFromPoints(points2), new THREE.LineBasicMaterial({color: 0x0}));
 
+        //regroupement des 2 lignes
         let groupe = new THREE.Group();
         groupe.add(curveObject);
         groupe.add(curveObject1);
         groupe.position.z = 0.03;
         let points = [];
+        //repartitions des points comme dans le lancer rectiligne pour faire ralentir le lancer au fure et mesure qu'il avance
         for (let i = 0; i < points1.length; i++) {
             if (i % 2 === 0) {
                 points.push(points1[i]);
@@ -144,7 +148,7 @@ class Pierrre {
 
     }
 
-
+    // function qui realise le deplacement de la pierre
     deplacement(points) {
         this.pierre.position.x = points.x;
         this.pierre.position.y = points.y;

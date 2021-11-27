@@ -46,7 +46,8 @@ function chocDetected(force) {
                             // console.log(pierres[i].pierre.position, pierres[y].pierre.position, pierres);
                             var dir = new THREE.Vector3().normalize();
                             dir.subVectors(posi, posy);
-                            return [true, chocanime(pierres[i], dir, force)];
+                            chocanime(pierres[i], dir, force);
+                            return true;
                         }
                     }
                 }
@@ -75,15 +76,17 @@ function chocanime(pierre, direction, force) {
     }
 
 }
-
+//calcule des distance la maison de toutes les pierres de la partie qui ont été lancer
 function calculeDistancetoMaison() {
-    for (let i = 0; i < pierres.length; i++) {
-        if (pierres[i].lancer) {
+    for (let i = 0; i < pierres.length; i++) {//on boucle autant de fois que de pierres
+        if (pierres[i].lancer) {//si la pierre a été lancer
+            //si la pierre est hors piste
             if (pierres[i].pierre.position.x > paramPiste.longueur / 2 + piste.position.x || -pierres[i].pierre.position.x > paramPiste.longueur / 2 + piste.position.x || pierres[i].pierre.position.y > paramPiste.largeur / 2 + piste.position.y || -pierres[i].pierre.position.y > paramPiste.largeur / 2 + piste.position.y) {
-                scene.remove(pierres[i].pierre);
-                pierres[i].distance = null;
-                pierres[i].hors_piste = true;
-            } else {
+                scene.remove(pierres[i].pierre);// on l'enleve de la scene
+                pierres[i].distance = null;// on met sa distance a null
+                pierres[i].hors_piste = true;// on l'indique comme hors piste
+            } else {// sinon
+                // on calcule sa distance a la maison et on le met dans distance une variable de la classe pierrre
                 pierres[i].distance = Math.round(vectcentreMaison.distanceTo(new THREE.Vector2(pierres[i].pierre.position.x, pierres[i].pierre.position.y)) * 100) / 100;
             }
         }

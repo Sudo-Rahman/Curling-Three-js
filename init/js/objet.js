@@ -1,3 +1,5 @@
+//############ La creation des objets ont nécessité des valeurs prédefinis, je les ais choisis aleatoirement ###############
+//############## A part pour les les lathe de bezier et les points de jointure qui ont été fait sur feuille et reporter ici ############
 // creation de la piste
 function Piste(param) {
     const geometrypiste = new THREE.CubeGeometry(param.longueur, param.largeur, 0.01);
@@ -53,6 +55,7 @@ function Piste(param) {
     group.add(circle2);
     group.add(circle3);
     group.add(circle4);
+    //on boucle sur tous les material des objet pour activer les ombres et les brillances
     for(let i=0;i<group.children.length;i++){
         group.children[i].receiveShadow = true;
         group.children[i].material.emissive = 0x0;
@@ -82,7 +85,7 @@ function Balai(param) {
     const group = new THREE.Group();
 
     //creation des poils
-    for (i = 0; i < param.nbPoils; i++) {
+    for (let i = 0; i < param.nbPoils; i++) {
         const geometrypoile = new THREE.CylinderGeometry(0.01, 0, 0.05, 16);
         const materialpoile = new THREE.MeshPhongMaterial({color: param.coulPoils, side: THREE.DoubleSide, specular : 0x111111});
         const cylinder = new THREE.Mesh(geometrypoile, materialpoile);
@@ -94,9 +97,9 @@ function Balai(param) {
     }
     group.add(manche);
     group.add(cube);
-    for(i=0;i<group.children.length;i++){
+    //on boucle sur tous les material des objet pour qu'il crée des ombres au contacte de la lumiere
+    for(let i=0;i<group.children.length;i++){
         group.children[i].castShadow = true;
-
     }
     return group;
 
@@ -201,7 +204,8 @@ function Pierre(param) {
     group.add(surface_haut_circle);
     group.add(endroit_pour_tenir_geometry);
     group.add(endroit_pour_tenir_geometry1);
-    for(i=0;i<group.children.length;i++){
+    //on boucle sur tous les material des objet pour qu'il crée des ombres au contacte de la lumiere
+    for(let i=0;i<group.children.length;i++){
         group.children[i].castShadow = true;
     }
     return group;

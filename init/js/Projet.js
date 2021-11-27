@@ -1,5 +1,5 @@
 function init() {
-    demarage(); // var qui contient la scene et la camera
+    demarage(); // on demarre la partie
     var gui = new dat.GUI(); // initialisation du gui
     guicamera(gui); //ajoute au gui les parametres de la camera
 
@@ -28,6 +28,7 @@ function init() {
         this.coulPoils = "#f7f9f9";
     }
 
+        // parametre de la pierre de base
     const paramPierre = new function () {
         this.taille = 0.1;
         this.coul = "#eb0f0f";
@@ -38,7 +39,7 @@ function init() {
     //####################### FIN PARAMETRE DES OBJETS ######################
 
 
-    //####################### PARAMETRE Phisiques des lancers ######################
+    //####################### PARAMETRES PARTIE ######################
 
     //parametres des lancers
     let paramLancer = new function () {
@@ -60,25 +61,24 @@ function init() {
     }
     // console.log(partie)
 
+    //####################### PARAMETRES PARTIE ######################
+
+    // ####################### CREATION DES OBJETS #####################
 
     //initialisation des pierres des equipes par defaut
     for (let y = 0; y < 5; y++) {
         pierres.push(new Pierrre(paramPierre, 1, "#1252d5"));
         pierres.push(new Pierrre(paramPierre, 2, "#ffffff"));
     }
-    //####################### fin PARAMETRE Phisiques des lancers ######################
-
-
-    // ####################### CREATION DES OBJETS #####################
 
     //objets
     piste = new Piste(paramPiste);// creation de la piste
     scene.add(piste);// ajout de la piste dans la scene
 
-
+    //creation des 2 balais
     var balais = [new Balai(paramBalai), new Balai(paramBalai)];// on creé deux balais
-    scene.add(balais[0], balais[1]);
-    placment_balai();
+    scene.add(balais[0], balais[1]);// ajout des balais a la scene
+    placment_balai();// on les places correctement sur la piste
 
     //fonction qui place les balais a leur point de depart
     function placment_balai() {
@@ -110,6 +110,7 @@ function init() {
         }
     }
 
+    //fonctio qui recrera une piste avec les parametre choisies par le joueur dans le gui
     function addAndRemovePiste() {
         if (!etat_partie) {// si la partie est en cours on ne bouge replace pas le balai au point de depart
             scene.remove(piste);// on retire la piste
@@ -190,7 +191,7 @@ function init() {
         }
     }
 
-    //
+    //animation des balais dans le sens Y
     function animebalaiY(pierre, delta, mode) {
         switch (mode) {
             case 1: {
@@ -205,21 +206,22 @@ function init() {
         }
     }
 
-
+    //animation des balais dans le sens X
     function animeBalaisX(pierre, point) {
         balais[0].position.x = point.x + paramBalai.longRec + pierre.taille;
         balais[1].position.x = balais[0].position.x + paramBalai.longRec * 1.6;
         // console.log(balais[0].position.x, pierre)
     }
 
-
+    // fonction qui stock le lancer dans une variable
     function deplacementparam(pierre) {
-        if (object != null) {
-            scene.remove(object[0]);
+        if (object != null) {// si objet n'est pas null
+            scene.remove(object[0]);// on enleve la previsualisation du lancer de la scene
 
         }
-        switch (paramLancer.id_lancer) {
+        switch (paramLancer.id_lancer) {// on fait un switch entre ce que le joueur a choisit dans le gui
             case "rectiligne": {
+                //on met dans objet la previsualisation du lancer et les points pour le lancer
                 object = pierre.deplacementRectiligne(paramLancer.forceN * paramLancer.force_de_frottement * 5, paramLancer.balai);
                 //console.log(object);
             }
@@ -235,23 +237,11 @@ function init() {
                 //console.log(object)
             }
         }
-        scene.add(object[0]);
+        scene.add(object[0]);// on ajoute la previsualisation du lancer dans la scene
     }
 
 
     // ####################### FIN CREATION DES OBJETS #####################
-
-
-    // ##################### DEBUT Partie ####################
-
-    var compteur = 0; // compteur qui servira pour gerer les tours
-    var alertmess = true; // var initialisé a vrai qui sert a ne pas spamé d'alert
-    var mess = document.getElementById("mess"); // var qui stock l'element html mess ou sera indiqué le tour d'une equipe et qui annoncera le gagnant
-    var webgl = document.getElementById("webgl");// var qui l'element html webgl
-    var lancer_ok_point_d_interogation = true;// var initialisé a vrai qui servir a ne pas lancer d'autres pierre avant que celle lancer ne se soit pas arreter
-    var object = null;
-
-    // ##################### FIN Partie ####################
 
 
     //################### DEBUT GUI  ##############################
@@ -321,60 +311,64 @@ function init() {
     });
     guiPartie.add(partie, "commencer").name("Commencer la partie").onChange(function () {
         if (!etat_partie) {
-            vectcentreMaison = new THREE.Vector2(paramPiste.longueur / 2 + piste.position.x - paramPiste.longueur / 10, piste.position.y);
-            mess.innerHTML = "Lancer 1 de l'equipe 1";
-            mess.style.color = pierres[0].couleur;
-            webgl.style.borderColor = pierres[0].couleur;
+            vectcentreMaison = new THREE.Vector2(paramPiste.longueur / 2 + piste.position.x - paramPiste.longueur / 10, piste.position.y);// on calcule le centre de la maison
+            mess = document.getElementById("mess");
+            webgl = document.getElementById("webgl");
+            console.log(mess);
+            mess.innerHTML = "Lancer 1 de l'equipe 1";// on initialise le texte des tours dans l'html
+            mess.style.color = pierres[0].couleur;// on le met de la couleur de l'equipe 1
+            webgl.style.borderColor = pierres[0].couleur; // on met la couleur de la bordure du jeu a la couleur de l'equipe 1
             let tr = document.getElementsByTagName('tr');
-            tr[1].children[0].style.color = pierres[0].couleur;
-            tr[2].children[0].style.color = pierres[1].couleur;
-            etat_partie = true;
-            let pierre = pierres[compteur];
-            scene.add(pierre.pierre);
-            placement_pierre(pierre.pierre);
-            deplacementparam(pierre);
+            tr[1].children[0].style.color = pierres[0].couleur;// on met le texte de la ligne 2 colonne 1 de la couleur de l'equipe 1
+            tr[2].children[0].style.color = pierres[1].couleur;// on met le texte de la ligne 3 colonne 1 de la couleur de l'equipe 2
+            etat_partie = true;// on met l'etat de la partie a vrai
+            let pierre = pierres[compteur];// on prend la premiere pierre
+            scene.add(pierre.pierre);// on l'ajoute a la scene
+            placement_pierre(pierre.pierre);// on le place correctement sur la piste
+            deplacementparam(pierre);// on recupere la previsualisation du lancer et les points de la pierre
             // console.log(pierres)
         }
     });
-    guiPartie.add(partie, "recommencer").name("recommencer la partie").onChange(function () {//modification de la largeur de la piste
-        location.reload();
+    guiPartie.add(partie, "recommencer").name("recommencer la partie").onChange(function () {
+        location.reload();// recharche la page
     });
 
     // repertoir pour les lancers
     let guiLancer = gui.addFolder("lancer");
     guiLancer.add(paramLancer, "forceN", 1, 25).onChange(function () {
-        if (etat_partie && lancer_ok_point_d_interogation) {
-            deplacementparam(pierres[compteur]);
+        if (etat_partie && lancer_ok_point_d_interogation) {// on regarde que la partie a bien été lancer et qu'il n'y a pas de lancer en cours
+            deplacementparam(pierres[compteur]);//recalcule le lancer avec les parametre modifié
         }
     });
     guiLancer.add(paramLancer, "force_de_frottement", 0.1, 1).onChange(function () {
-        if (etat_partie && lancer_ok_point_d_interogation) {
-            deplacementparam(pierres[compteur]);
+        if (etat_partie && lancer_ok_point_d_interogation) {// on regarde que la partie a bien été lancer et qu'il n'y a pas de lancer en cours
+            deplacementparam(pierres[compteur]);//recalcule le lancer avec les parametre modifié
         }
     });
     guiLancer.add(paramLancer, "balai", -1, 1).name("point de controle").onChange(function () {
-        if (etat_partie && lancer_ok_point_d_interogation) {
-            deplacementparam(pierres[compteur]);
+        if (etat_partie && lancer_ok_point_d_interogation) {// on regarde que la partie a bien été lancer et qu'il n'y a pas de lancer en cours
+            deplacementparam(pierres[compteur]);//recalcule le lancer avec les parametre modifié
         }
     });
     guiLancer.add(paramLancer, "id_lancer", ["rectiligne", "bezier", "bezier2"]).name("choix lancer").onChange(function () {
-        if (etat_partie && lancer_ok_point_d_interogation) {
-            deplacementparam(pierres[compteur]);
+        if (etat_partie && lancer_ok_point_d_interogation) {// on regarde que la partie a bien été lancer et qu'il n'y a pas de lancer en cours
+            deplacementparam(pierres[compteur]);//recalcule le lancer avec les parametre modifié
         }
     });
     guiLancer.add(paramLancer, "lancer").onChange(function () {//modification de la largeur de la piste
-        if (etat_partie && lancer_ok_point_d_interogation) {
-            scene.remove(object[0]);
+        if (etat_partie && lancer_ok_point_d_interogation) {// on regarde que la partie a bien été lancer et qu'il n'y a pas de lancer en cours
+            scene.remove(object[0]);// on eneleve la previsualisation du lancer de la scene
             time = 0;
-            let pierre = pierres[compteur];
-            let i = 0;
-            lancer_ok_point_d_interogation = false;
+            let pierre = pierres[compteur];// on recupere la ieme pierre du ieme lancer
+            let i = 0;// on initialise i a 0
+            lancer_ok_point_d_interogation = false;// on met la variable a faux
             lancer();
 
+            //fonction qui gere le lancer de la pierre avec toutes ses contrainte : choc, animation
             function lancer() {
-                if (i !== object[1].length) {
-                    pierre.lancer = true;
-                    pierre.deplacement(object[1][i]);
+                if (i !== object[1].length) {// on boucle autant de fois que de points
+                    pierre.lancer = true;// on met la variable lancer de la pierre a vrai
+                    pierre.deplacement(object[1][i]);// on deplace la pierre au cordonné du ieme point
                     if (compteur >= 1) {// pour la premiere pierre a lancer on ne regarde pas si il y a choc ou pas car ya pas d'autre pierre
                         if (!chocDetected(paramLancer.forceN)) {//si on ne detecte pas de choc on continue l'animation
                             requestAnimationFrame(lancer);
@@ -406,54 +400,59 @@ function init() {
     function lancerend() {
         setTimeout(() => {//on fait attendre 2 seconde avant de recalculer les pos des pierres et on reset la pos de la camera
             compteurr();// on increment le compteur de lancer de pierre
-            camera_reset_pos(paramPiste.longueur / 100);
+            camera_reset_pos(paramPiste.longueur / 100);// on reset la position de la camera
             lancer_ok_point_d_interogation = true;
         }, 2000);
     }
 
+    //fontion qui sert a augmenter le compteur apres chaque lancer
     function compteurr() {
-        if (compteur === 9) {
-            arreter_partie();
-            placment_balai();
+        if (compteur === 9) {//si tous les lancers on été effectué
+            arreter_partie();// on arrete la partie
+            placment_balai();// on replace les balais
             return false;
-        } else {
-            compteur++;
-            console.log(compteur);
-            actualisationDistancetoMaison();
-            addPierreGame();
-            message_tour();
+        } else {//sinon
+            compteur++;// on incremente le competeur de 1
+            // console.log(compteur);
+            actualisationDistancetoMaison();// on actualise le tableau des distance
+            addPierreGame();// on ajoute la prochaine pierre a la scene
+            message_tour();// on affiche le message dans l'html
             return true;
         }
 
     }
 
+    //fonction qui actualise les valeurs dans le tableau dans l'html
     function actualisationDistancetoMaison() {
-        calculeDistancetoMaison();
-        let min = 100000;
-        let pierre = null;
-        let pierrereturn = null;
-        let tr = document.getElementsByTagName('tr');
-        for (let i = 1; i < tr.length; i++) {// on boucle pour changer la couleur de l'ecriture dans le tableau avec l'equipe la plus proche
-            for (let o = 1; o < 6; o++) {
-                if (i === 1) {
-                    pierre = pierres[(o - 1) * 2];
-                } else {
+        calculeDistancetoMaison();// on calcules les distances des pierres
+        let min = new Pierrre(paramPierre, -1, 'black');// on creé une pierre factice pour comparé les distances
+        min.distance = 100000;// on initialise sa distance
+        let pierre = null;// on initialise pierre a null
+        let pierrereturn = null;// on initialise la pierre qui sera retourner a null
+        let tr = document.getElementsByTagName('tr');// on recupere le tableau du html
+        for (let i = 1; i < tr.length; i++) {
+            for (let o = 1; o < 6; o++) {// on boucle sur les cases des distances
+                if (i === 1) {// si i est egale a 1 alors c'est léquipe 1
+                    pierre = pierres[(o - 1) * 2];// on met un a un les pierre de l'quipe 1 en commenceant de 0 dans pierre
+                } else {//sinon equipe 2
                     pierre = pierres[(o * 2) - 1];
                 }
-                if (pierre.hors_piste) {
-                    tr[i].children[o].innerHTML = "Hors piste";
-                } else {
-                    if (pierre.distance != null) {
-                        tr[i].children[o].innerHTML = pierre.distance + " m du centre de la maison";
-                        if (pierre.distance < min) {
-                            min = pierre.distance;
+                if (pierre.hors_piste) {// on regarge si la pierre est hors piste
+                    tr[i].children[o].innerHTML = "Hors piste";// si il l'est alors on met hors piste dans la case
+                } else {//sinon
+                    if (pierre.distance != null) {// on regarde que la distance de la pierre n'est pas null
+                        tr[i].children[o].innerHTML = pierre.distance + " m du centre de la maison"; // on met sa distance dans la case
+                        if (pierre.distance < min.distance) {// on compare la distance de la pierre a min
+                            min = pierre;//si la distance de la pierre est plus petite que min on met dans min par la pierre la plus proche de la maison
                             // console.log(pierre)
-                            coloriage(pierre.couleur);
-                            pierrereturn = pierre;
-                        } else {
-                            if (pierre.distance === min) {
-                                pierrereturn = new Pierrre(paramPierre, -1, "black");
-                                pierrereturn.distance = min;
+                            coloriage(min.couleur);// on applique la couleur de l'equipe qui a la distance plus petite sur toutes les cases
+                            pierrereturn = pierre;// on met la pierre dans la variable pierrereturn
+                        } else {// sinon
+                            if (pierre.equipe !== min.equipe) {// on regarde que le lancer et et le min ne sont pas de meme equipe
+                                if (pierre.distance === min.distance) {// on regarde si ya egalité
+                                    pierrereturn = new Pierrre(paramPierre, -1, "black");// si ya egalité on retourne une pierrre speciale
+                                    pierrereturn.distance = min;
+                                }
                             }
                         }
                     }
@@ -490,7 +489,7 @@ function init() {
     function arreter_partie() {
         etat_partie = false;
         let pierre = actualisationDistancetoMaison();
-        console.log(pierre)
+        // console.log(pierre);
         if (pierre != null) {
             if (pierre.equipe === -1) {
                 mess.innerHTML = "Partie terminé avec égalité entre les 2 equipes et une distance de " + pierre.distance;
