@@ -1,6 +1,5 @@
 function init() {
     demarage(); // var qui contient la scene et la camera
-    camera.updateProjectionMatrix();
     var gui = new dat.GUI(); // initialisation du gui
     guicamera(gui); //ajoute au gui les parametres de la camera
 
@@ -222,22 +221,21 @@ function init() {
         switch (paramLancer.id_lancer) {
             case "rectiligne": {
                 object = pierre.deplacementRectiligne(paramLancer.forceN * paramLancer.force_de_frottement * 5, paramLancer.balai);
-                scene.add(object[0]);
                 //console.log(object);
             }
                 break;
             case "bezier": {
                 object = pierre.deplacementBezier(paramLancer.forceN * paramLancer.force_de_frottement * 5, paramLancer.balai);
-                scene.add(object[0]);
                 //console.log(object)
             }
                 break;
-            case "bezier2":{
+            case "bezier2": {
                 object = pierre.deplacementBezier2(paramLancer.forceN * paramLancer.force_de_frottement * 5, paramLancer.balai);
                 scene.add(object[0]);
                 //console.log(object)
             }
         }
+        scene.add(object[0]);
     }
 
 
@@ -335,14 +333,11 @@ function init() {
             scene.add(pierre.pierre);
             placement_pierre(pierre.pierre);
             deplacementparam(pierre);
-            console.log(pierres)
-            // console.log(pierres);
+            // console.log(pierres)
         }
     });
     guiPartie.add(partie, "recommencer").name("recommencer la partie").onChange(function () {//modification de la largeur de la piste
-        if (etat_partie) {
-            location.reload();
-        }
+        location.reload();
     });
 
     // repertoir pour les lancers
@@ -357,7 +352,7 @@ function init() {
             deplacementparam(pierres[compteur]);
         }
     });
-    guiLancer.add(paramLancer, "balai", 0.1, 1).name("point de controle").onChange(function () {
+    guiLancer.add(paramLancer, "balai", -1, 1).name("point de controle").onChange(function () {
         if (etat_partie && lancer_ok_point_d_interogation) {
             deplacementparam(pierres[compteur]);
         }
@@ -372,8 +367,6 @@ function init() {
             scene.remove(object[0]);
             time = 0;
             let pierre = pierres[compteur];
-            var clock = new THREE.Clock();
-            var delta = null;
             let i = 0;
             lancer_ok_point_d_interogation = false;
             lancer();
@@ -381,7 +374,6 @@ function init() {
             function lancer() {
                 if (i !== object[1].length) {
                     pierre.lancer = true;
-                    delta = clock.getDelta();
                     pierre.deplacement(object[1][i]);
                     if (compteur >= 1) {// pour la premiere pierre a lancer on ne regarde pas si il y a choc ou pas car ya pas d'autre pierre
                         if (!chocDetected(paramLancer.forceN)) {//si on ne detecte pas de choc on continue l'animation
@@ -455,7 +447,7 @@ function init() {
                         tr[i].children[o].innerHTML = pierre.distance + " m du centre de la maison";
                         if (pierre.distance < min) {
                             min = pierre.distance;
-                            console.log(pierre)
+                            // console.log(pierre)
                             coloriage(pierre.couleur);
                             pierrereturn = pierre;
                         } else {
@@ -511,7 +503,7 @@ function init() {
             mess.style.color = "black";
         }
     }
-    
+
 
 //fonction qui place les balais et ajoute la pierre suivante pour le prochain lancer
     function addPierreGame() {

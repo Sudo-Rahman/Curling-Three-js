@@ -1,6 +1,5 @@
-function camera_reset_pos( zoom) {//fonction qui repositionne la camera apres un lancer
+function camera_reset_pos(zoom) {//fonction qui repositionne la camera apres un lancer
     camera.zoom = 0.5 - zoom;
-    console.log(zoom)
     camera.position.x = 0;
     camera.position.z = 10;
     camera.position.y = 0.001;
@@ -9,7 +8,7 @@ function camera_reset_pos( zoom) {//fonction qui repositionne la camera apres un
 }
 
 //fonction qui fait en sorte que la camera suive la pierre pendant le lancer
-function camera_suivie( pierre) {
+function camera_suivie(pierre) {
     camera.position.x = pierre.pierre.position.x - pierre.taille - 6;
     camera.position.y = pierre.pierre.position.y;
     camera.position.z = 4;
@@ -43,11 +42,11 @@ function chocDetected(force) {
                         let distance = posi.distanceTo(posy);
                         //console.log(distance <= liste_pierre[i].rayon + liste_pierre[y].rayon, distance, liste_pierre[i].rayon, liste_pierre[y].rayon)
                         if (distance < pierres[i].rayon + pierres[y].rayon) {
-                            console.log("choc detecter");
-                            console.log(pierres[i].pierre.position, pierres[y].pierre.position, pierres);
+                            // console.log("choc detecter");
+                            // console.log(pierres[i].pierre.position, pierres[y].pierre.position, pierres);
                             var dir = new THREE.Vector3().normalize();
                             dir.subVectors(posi, posy);
-                            return [true, chocanime(pierres[i], dir,force)];
+                            return [true, chocanime(pierres[i], dir, force)];
                         }
                     }
                 }
@@ -57,15 +56,15 @@ function chocDetected(force) {
     return false;
 }
 
-function chocanime(pierre, direction,force) {
+function chocanime(pierre, direction, force) {
     let x = direction.x * 0.014;
     let y = direction.y * 0.014;
-    console.log(pierre, x, y,Math.round(force*2));
+    // console.log(pierre, x, y,Math.round(force*2));
     let i = 0;
     anime();
 
     function anime() {
-        if (i < Math.round(force*2)) {
+        if (i < Math.round(force * 2)) {
             requestAnimationFrame(anime);
             pierre.pierre.position.x += x;
             pierre.pierre.position.y += y;
@@ -80,7 +79,7 @@ function chocanime(pierre, direction,force) {
 function calculeDistancetoMaison() {
     for (let i = 0; i < pierres.length; i++) {
         if (pierres[i].lancer) {
-            if (pierres[i].pierre.position.x > paramPiste.longueur / 2 + piste.position.x || pierres[i].pierre.position.y > paramPiste.largeur / 2 + piste.position.y || -pierres[i].pierre.position.x < -paramPiste.longueur / 2 + piste.position.x) {
+            if (pierres[i].pierre.position.x > paramPiste.longueur / 2 + piste.position.x || -pierres[i].pierre.position.x > paramPiste.longueur / 2 + piste.position.x || pierres[i].pierre.position.y > paramPiste.largeur / 2 + piste.position.y || -pierres[i].pierre.position.y > paramPiste.largeur / 2 + piste.position.y) {
                 scene.remove(pierres[i].pierre);
                 pierres[i].distance = null;
                 pierres[i].hors_piste = true;
