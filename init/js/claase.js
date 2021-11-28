@@ -16,7 +16,7 @@ class Pierrre {
         let departy = this.pierre.position.y;//point de depart Y
         let points = [];// stockage des points
         let arrivex = (distance / 10 * vectcentreMaison.x + (Math.random() < 0.5 ? -0.1 : 0.1)) * 2;// on rajoute de l'aléatoir avec random
-        let arrivey = vectcentreMaison.y +  intensite * 3;
+        let arrivey = vectcentreMaison.y + intensite * 3;
         let X = departx;
         let Y = departy;
         let i;
@@ -92,20 +92,16 @@ class Pierrre {
         let points = [];
         //repartitions des points comme dans le lancer rectiligne pour faire ralentir le lancer au fure et mesure qu'il avance
         for (let i = 0; i < points1.length; i++) {
-            if (i % 2 === 0) {
-                points.push(points1[i]);
-            }
+            points.push(points1[i]);
         }
         for (let i = 0; i < points2.length; i++) {
             if (i < 200) {
-                if (i % 4 === 0) {
+                if (i % 2 === 0) {
                     points.push(points2[i]);
                 }
             }
             if (i >= 200) {
-                if (i % 2 === 0) {
-                    points.push(points2[i]);
-                }
+                points.push(points2[i]);
             }
         }
         // console.log(points)
@@ -125,7 +121,7 @@ class Pierrre {
             new THREE.Vector2(arrivex / 2, (paramPiste.largeur + piste.position.y) * intensite),
             new THREE.Vector2(arrivex, arrivey)
         );
-        const points1 = curve.getPoints(300);
+        const points1 = curve.getPoints(500);
         const curveObject = new THREE.Line(new THREE.BufferGeometry().setFromPoints(points1), new THREE.LineBasicMaterial({color: 0x0}));
         curveObject.position.z = 0.03;
         let points = [];

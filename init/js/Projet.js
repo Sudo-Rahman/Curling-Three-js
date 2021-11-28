@@ -28,7 +28,7 @@ function init() {
         this.coulPoils = "#f7f9f9";
     }
 
-        // parametre de la pierre de base
+    // parametre de la pierre de base
     const paramPierre = new function () {
         this.taille = 0.1;
         this.coul = "#eb0f0f";
@@ -174,38 +174,26 @@ function init() {
 
     function animeBalais(pierre, point) {
         animeBalaisX(pierre, point);
-        max_balais = point.y + paramPierre.taille + piste.position.y + paramPiste.largeur / 6;
-        min_balais = point.y;
-        animebalaiY(pierre.pierre, time, mode);
+        max_balais = point.y + pierre.rayon + piste.position.y + 0.3;
+        min_balais = point.y - pierre.rayon - piste.position.y - 0.3;
+        console.log(max_balais, min_balais,balais[1].position.y);
         if (mode === 1) {
+            balais[0].position.y = time+point.y;
+            balais[1].position.y = -time+point.y;
             time += 0.014;
-            if (time >= max_balais) {
+            if (time+point.y >= max_balais) {
                 mode *= (-1);
             }
         }
         if (mode === -1) {
+            balais[0].position.y = time+point.y;
+            balais[1].position.y = -time+point.y;
             time -= 0.014;
-            if (time <= min_balais) {
+            if (time +point.y <= min_balais) {
                 mode *= (-1);
             }
         }
     }
-
-    //animation des balais dans le sens Y
-    function animebalaiY(pierre, delta, mode) {
-        switch (mode) {
-            case 1: {
-                balais[0].position.y = delta;
-                balais[1].position.y = -balais[0].position.y;
-            }
-                break;
-            case -1: {
-                balais[0].position.y = delta;
-                balais[1].position.y = -balais[0].position.y;
-            }
-        }
-    }
-
     //animation des balais dans le sens X
     function animeBalaisX(pierre, point) {
         balais[0].position.x = point.x + paramBalai.longRec + pierre.taille;
@@ -359,6 +347,7 @@ function init() {
         if (etat_partie && lancer_ok_point_d_interogation) {// on regarde que la partie a bien été lancer et qu'il n'y a pas de lancer en cours
             scene.remove(object[0]);// on eneleve la previsualisation du lancer de la scene
             time = 0;
+            time2 = 0;
             let pierre = pierres[compteur];// on recupere la ieme pierre du ieme lancer
             let i = 0;// on initialise i a 0
             lancer_ok_point_d_interogation = false;// on met la variable a faux
