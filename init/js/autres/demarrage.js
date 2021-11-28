@@ -13,7 +13,9 @@ function demarage() {
     cameraLumiere(scene, camera);
     //lumiere(scene);
     repere(scene);
-    let light1 = new THREE.DirectionalLight(0xFFFFFF, 0.5,100);
+
+    //ajout de plusieurs lumieres directionelles avec envoie d'ombre, et une lumiere ambiente
+    let light1 = new THREE.DirectionalLight(0xFFFFFF, 0.5, 100);
     light1.position.set(-25, 25, 80);
     light1.target.position.set(0, 0, 0);
     light1.shadow.mapSize.width = 2000;
@@ -29,7 +31,7 @@ function demarage() {
     // let helper = new THREE.CameraHelper(light1.shadow.camera);
     // scene.add(helper);
     // console.log(helper);
-    let light = new THREE.DirectionalLight(0xFFFFFF, 0.5,100);
+    let light = new THREE.DirectionalLight(0xFFFFFF, 0.5, 100);
     light.position.set(15, 0, 5);
     light.target.position.set(0, 0, 0);
     light.shadow.mapSize.width = 2000;
@@ -42,7 +44,6 @@ function demarage() {
     scene.add(light);
     scene.add(light.target);
     scene.add(new THREE.AmbientLight(0xFFFFFF, 0.3));
-
 
 
     var axes = new THREE.AxesHelper(1);

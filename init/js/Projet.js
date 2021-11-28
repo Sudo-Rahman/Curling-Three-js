@@ -167,33 +167,34 @@ function init() {
         }
     }
 
-    var time = 0;
-    var mode = 1;
+    var time = 0;// va servir a faire bouger les balais sur la pos Y
+    var mode = 1;// mode qui va servir si les balais doivent avancer ou reculer
     var min_balais = 0;
     var max_balais = 0;
 
     function animeBalais(pierre, point) {
-        animeBalaisX(pierre, point);
-        max_balais = point.y + pierre.rayon + piste.position.y + 0.3;
-        min_balais = point.y - pierre.rayon - piste.position.y - 0.3;
-        console.log(max_balais, min_balais,balais[1].position.y);
+        animeBalaisX(pierre, point);// les balai suives les point du lancer au niveau de la posisiton x
+        max_balais = point.y + pierre.rayon + piste.position.y + 0.3;// l'intesité de l'aller des balais
+        min_balais = point.y - pierre.rayon - piste.position.y - 0.3;// l'intesité du recule des balais
+        // console.log(max_balais, min_balais,balais[1].position.y);
         if (mode === 1) {
-            balais[0].position.y = time+point.y;
-            balais[1].position.y = -time+point.y;
+            balais[0].position.y = time + point.y;//aller du balais 1
+            balais[1].position.y = -time + point.y;// recule du balais 2
             time += 0.014;
-            if (time+point.y >= max_balais) {
+            if (time + point.y >= max_balais) {
                 mode *= (-1);
             }
         }
         if (mode === -1) {
-            balais[0].position.y = time+point.y;
-            balais[1].position.y = -time+point.y;
+            balais[0].position.y = time + point.y;// recule du balais 1
+            balais[1].position.y = -time + point.y;// aller du balais 2
             time -= 0.014;
-            if (time +point.y <= min_balais) {
+            if (time + point.y <= min_balais) {
                 mode *= (-1);
             }
         }
     }
+
     //animation des balais dans le sens X
     function animeBalaisX(pierre, point) {
         balais[0].position.x = point.x + paramBalai.longRec + pierre.taille;

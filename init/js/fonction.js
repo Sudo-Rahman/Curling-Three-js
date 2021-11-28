@@ -76,6 +76,7 @@ function chocanime(pierre, direction, force) {
     }
 
 }
+
 //calcule des distance la maison de toutes les pierres de la partie qui ont été lancer
 function calculeDistancetoMaison() {
     for (let i = 0; i < pierres.length; i++) {//on boucle autant de fois que de pierres
