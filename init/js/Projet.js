@@ -174,8 +174,8 @@ function init() {
 
     function animeBalais(pierre, point) {
         animeBalaisX(pierre, point);// les balai suives les point du lancer au niveau de la posisiton x
-        max_balais = point.y + pierre.rayon + piste.position.y + 0.3;// l'intesité de l'aller des balais
-        min_balais = point.y - pierre.rayon - piste.position.y - 0.3;// l'intesité du recule des balais
+        max_balais = point.y + pierre.rayon + piste.position.y + 0.2;// l'intesité de l'aller des balais
+        min_balais = point.y - pierre.rayon - piste.position.y - 0.2;// l'intesité du recule des balais
         // console.log(max_balais, min_balais,balais[1].position.y);
         if (mode === 1) {
             balais[0].position.y = time + point.y;//aller du balais 1
@@ -303,7 +303,7 @@ function init() {
             vectcentreMaison = new THREE.Vector2(paramPiste.longueur / 2 + piste.position.x - paramPiste.longueur / 10, piste.position.y);// on calcule le centre de la maison
             mess = document.getElementById("mess");
             webgl = document.getElementById("webgl");
-            console.log(mess);
+            // console.log(mess);
             mess.innerHTML = "Lancer 1 de l'equipe 1";// on initialise le texte des tours dans l'html
             mess.style.color = pierres[0].couleur;// on le met de la couleur de l'equipe 1
             webgl.style.borderColor = pierres[0].couleur; // on met la couleur de la bordure du jeu a la couleur de l'equipe 1
@@ -381,7 +381,12 @@ function init() {
                 }
             }
         } else {
-            alert("Attendez que le lancer se termine ou ajouter la pierre a la piste");
+            if(!lancer_ok_point_d_interogation){
+                alert("Attendez que le lancer se termine");
+            }
+            if(compteur === 9){
+                alert("La partie est terminé recommencer la pour pouvoir rejouer");
+            }
         }
 
     });
@@ -477,7 +482,6 @@ function init() {
 
 //fonction qui arrete la partie quand le compteur atteint le nombre de lancer qui vaut 9
     function arreter_partie() {
-        etat_partie = false;
         let pierre = actualisationDistancetoMaison();
         // console.log(pierre);
         if (pierre != null) {
