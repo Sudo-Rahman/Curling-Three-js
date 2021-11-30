@@ -36,15 +36,17 @@ function chocDetected(force) {
         if (pierres[i].lancer !== false && !pierres[i].hors_piste) {
             for (let y = 0; y < pierres.length; y++) {
                 if (pierres[y].lancer !== false && !pierres[y].hors_piste) {
-                    if (i !== y) {
+                    if (i !== y) {//on compare pas la meme pierre avec elle
+                        //on recupere la position de la pierre i
                         let posi = new THREE.Vector3(pierres[i].pierre.position.x, pierres[i].pierre.position.y, pierres[i].pierre.position.z);
+                        // de meme avec la pierre y
                         let posy = new THREE.Vector3(pierres[y].pierre.position.x, pierres[y].pierre.position.y, pierres[y].pierre.position.z);
-                        let distance = posi.distanceTo(posy);
+                        let distance = posi.distanceTo(posy);//on calcule la distance entre la pierre i et la pierre y
                         //console.log(distance <= liste_pierre[i].rayon + liste_pierre[y].rayon, distance, liste_pierre[i].rayon, liste_pierre[y].rayon)
-                        if (distance < pierres[i].rayon + pierres[y].rayon) {
+                        if (distance < pierres[i].rayon + pierres[y].rayon) {//si la distance entre les deux pierre est plus petite que la somme des rayon des 2 pierres, alors il y a choc
                             // console.log("choc detecter");
                             // console.log(pierres[i].pierre.position, pierres[y].pierre.position, pierres);
-                            var dir = new THREE.Vector3().normalize();
+                            var dir = new THREE.Vector3().normalize();//on recupere le vecteur normal
                             dir.subVectors(posi, posy);
                             chocanime(pierres[i], dir, force);
                             return true;
@@ -57,6 +59,7 @@ function chocDetected(force) {
     return false;
 }
 
+//fonction qui anime le choc entre 2 pierres
 function chocanime(pierre, direction, force) {
     let x = direction.x * 0.014;
     let y = direction.y * 0.014;
