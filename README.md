@@ -12,14 +12,21 @@ Quelques contraintes du sujet à l’aide :
     - Pour chaque pierre, la « lathe » intermédiaire a une couleur différente des deux autres surfaces de révolution.
 
   • les balais doivent être construits à l’aide :
+  
     - Un cylindre pour le manche.
+    
     - Un parallélépipède rectangle.
+    
     - Des cônes de révolution pour les poils.
 
   • Déplacement et animation : 
+  
     - Un déplacement rectiligne.
+    
     - Un déplacement plan non rectiligne via des courbe(s) de Bézier (avec jointure G1).
+    
     - Un menu permettant de modifier la trajectoire de la pierre sur la glace via les balais ce qui conduit à la modification de certains points de contrôle (ce       projet n’est pas une simulation).
+    
     - Après chaque lancer, le score (nombre de pièces de la même équipe dans la maison le plus proche du centre) est ajouté dans un tableau dans la page html et       la couleur du texte est celle de la pierre de l’équipe qui mène (un choix est à faire dans le cas où il n’y a pas depierre dans la maison).
    
   • Rapport pour vendre le travail, le mettre en valeur.
