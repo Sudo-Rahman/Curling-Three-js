@@ -39,7 +39,7 @@ Language utilisé : javascript (librairie THREE js), css, html
    
   • Rapport pour vendre le travail, le mettre en valeur.
 
-Fonctionnalités additionnelles ajoutées en plus :
+# Fonctionnalités additionnelles ajoutées en plus :
   
   - Possibilité de modifier les paramètres des objets avant de lancer la partie telle que la taille d'une pierre, sa couleur, la taille de la piste, des             balais...
   - Prise en charge du hors-piste : dès qu'une pierre n'est pas dans la piste il sera considére hors-piste et donc on ne comptabilisera pas sa distance à la         maison.
