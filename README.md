@@ -1,7 +1,11 @@
 # projet en info3B à l'université de bourgogne
+
 Autheur : Rahman YILMAZ, Lucie DUBOST
+
 Copyright : Rahman YILMAZ, Lucie DUBOST
+
 Réalisation d'un site web pour pouvoir faire une partie de curling
+
 Language utilisé : javascript (librairie THREE js), css, html
 
 Quelques contraintes du sujet à l’aide :
