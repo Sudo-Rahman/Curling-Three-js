@@ -44,6 +44,6 @@ Language utilisé : javascript (librairie THREE js), css, html
   - Possibilité de modifier les paramètres des objets avant de lancer la partie telle que la taille d'une pierre, sa couleur, la taille de la piste, des             balais...
   - Prise en charge du hors-piste : dès qu'une pierre n'est pas dans la piste il sera considére hors-piste et donc on ne comptabilisera pas sa distance à la         maison.
   - Prise en charge des chocs entre toutes les pierres : exemple --> une pierre lancer avec une grosse force peut éjecter toutes les pierres sur la piste en dehors     de la piste pour qu'elles soient hors-piste.
-  - Ajout d'un lancer bezier2 sans jointure pour avoir des 3 déplacements.
+  - Ajout d'un lancer bezier2 sans jointure pour avoir un troisieme déplacement.
   - Ajout des ombres, de la réflectivité de la lumière sur la piste, les objets...
   - Lors du lancer, ajout d'un tracking, la caméra suit de pres le lancer.
