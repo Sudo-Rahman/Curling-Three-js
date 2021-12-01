@@ -8,9 +8,10 @@ Réalisation d'un site web pour pouvoir faire une partie de curling
 
 Language utilisé : javascript (librairie THREE js), css, html
 
-Quelques contraintes du sujet à l’aide :
 
-  • les pierres doivent être construites :
+# Quelques contraintes du sujet :
+
+  • les pierres doivent être construites à l’aide :
   
     - D’au moins trois surfaces de révolution avec un raccord G1 entre chaque surface, l’utilisation d’au moins deux « lathe » lisses est obligatoire et celles-ci doivent se raccorder entre elles.
       
