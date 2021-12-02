@@ -1,4 +1,4 @@
-function camera_reset_pos(zoom) {//fonction qui repositionne la camera apres un lancer
+function camera_reset_pos(zoom) { //Fonction qui repositionne la caméra après un lancer
     camera.zoom = 0.5 - zoom;
     camera.position.x = 0;
     camera.position.z = 10;
@@ -7,7 +7,7 @@ function camera_reset_pos(zoom) {//fonction qui repositionne la camera apres un 
     camera.updateProjectionMatrix();
 }
 
-//fonction qui fait en sorte que la camera suive la pierre pendant le lancer
+//Fonction qui fait en sorte que la caméra suive la pierre pendant le lancer
 function camera_suivie(pierre) {
     camera.position.x = pierre.pierre.position.x - pierre.taille - 6;
     camera.position.y = pierre.pierre.position.y;
@@ -17,10 +17,10 @@ function camera_suivie(pierre) {
 }
 
 
-//fonction qui retourne le mini d'une liste
+//Fonction qui retourne le minimum d'une liste
 function getmini(tab) {
     let tab1 = [];
-    //on boucle pour enlever les valeurs nuull
+    //On boucle pour enlever les valeurs null du tableau
     for (let i = 0; i < tab.length; i++) {
         if (tab[i] !== null) {
             tab1.push(tab[i]);
@@ -30,23 +30,23 @@ function getmini(tab) {
 }
 
 
-// fonction qiui detecte si il y a un choc entre les pierres
+//Fonction qui détecte si il y a un choc entre les pierres
 function chocDetected(force) {
     for (let i = 0; i < pierres.length; i++) {
         if (pierres[i].lancer !== false && !pierres[i].hors_piste) {
             for (let y = 0; y < pierres.length; y++) {
                 if (pierres[y].lancer !== false && !pierres[y].hors_piste) {
-                    if (i !== y) {//on compare pas la meme pierre avec elle
-                        //on recupere la position de la pierre i
+                    if (i !== y) { //Pour s'assurer de ne pas comparer une pierre avec elle-même
+                        //On récupère la position de la pierre i
                         let posi = new THREE.Vector3(pierres[i].pierre.position.x, pierres[i].pierre.position.y, pierres[i].pierre.position.z);
-                        // de meme avec la pierre y
+                        //De même avec la pierre y
                         let posy = new THREE.Vector3(pierres[y].pierre.position.x, pierres[y].pierre.position.y, pierres[y].pierre.position.z);
-                        let distance = posi.distanceTo(posy);//on calcule la distance entre la pierre i et la pierre y
+                        let distance = posi.distanceTo(posy); //On calcule la distance entre la pierre i et la pierre y
                         //console.log(distance <= liste_pierre[i].rayon + liste_pierre[y].rayon, distance, liste_pierre[i].rayon, liste_pierre[y].rayon)
-                        if (distance < pierres[i].rayon + pierres[y].rayon) {//si la distance entre les deux pierre est plus petite que la somme des rayon des 2 pierres, alors il y a choc
+                        if (distance < pierres[i].rayon + pierres[y].rayon) { //Si la distance entre les deux pierres est plus petite que la somme des rayons des 2 pierres, alors il y a choc
                             // console.log("choc detecter");
                             // console.log(pierres[i].pierre.position, pierres[y].pierre.position, pierres);
-                            var dir = new THREE.Vector3().normalize();//on recupere le vecteur normal
+                            var dir = new THREE.Vector3().normalize(); //On récupère le vecteur normal
                             dir.subVectors(posi, posy);
                             chocanime(pierres[i], dir, force);
                             return true;
@@ -59,7 +59,7 @@ function chocDetected(force) {
     return false;
 }
 
-//fonction qui anime le choc entre 2 pierres
+//Fonction qui anime le choc entre 2 pierres
 function chocanime(pierre, direction, force) {
     let x = direction.x * 0.014;
     let y = direction.y * 0.014;
@@ -80,17 +80,17 @@ function chocanime(pierre, direction, force) {
 
 }
 
-//calcule des distance la maison de toutes les pierres de la partie qui ont été lancer
+//Calcul des distances à la maison de toutes les pierres lancées de la partie
 function calculeDistancetoMaison() {
-    for (let i = 0; i < pierres.length; i++) {//on boucle autant de fois que de pierres
-        if (pierres[i].lancer) {//si la pierre a été lancer
-            //si la pierre est hors piste
+    for (let i = 0; i < pierres.length; i++) { //On boucle autant de fois que de pierres
+        if (pierres[i].lancer) { //Si la pierre a été lancée
+            //Si la pierre est hors piste :
             if (pierres[i].pierre.position.x > paramPiste.longueur / 2 + piste.position.x || -pierres[i].pierre.position.x > paramPiste.longueur / 2 + piste.position.x || pierres[i].pierre.position.y > paramPiste.largeur / 2 + piste.position.y || -pierres[i].pierre.position.y > paramPiste.largeur / 2 + piste.position.y) {
-                scene.remove(pierres[i].pierre);// on l'enleve de la scene
-                pierres[i].distance = null;// on met sa distance a null
-                pierres[i].hors_piste = true;// on l'indique comme hors piste
-            } else {// sinon
-                // on calcule sa distance a la maison et on le met dans distance une variable de la classe pierrre
+                scene.remove(pierres[i].pierre); //On l'enlève de la scène
+                pierres[i].distance = null; //On met sa distance à null
+                pierres[i].hors_piste = true; //On l'indique comme hors piste
+            } else { //Sinon :
+                //On calcule sa distance à la maison et on la met dans distance, une variable de la classe pierrre
                 pierres[i].distance = Math.round(vectcentreMaison.distanceTo(new THREE.Vector2(pierres[i].pierre.position.x, pierres[i].pierre.position.y)) * 100) / 100;
             }
         }

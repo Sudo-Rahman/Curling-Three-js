@@ -1,6 +1,6 @@
 function demarage() {
     var stats = initStats();
-    // creation de rendu et de la taille
+    //Création du rendu et de la taille
     let rendu = new THREE.WebGLRenderer({antialias: true});
     rendu.shadowMap.enabled = true;
     scene = new THREE.Scene();
@@ -14,7 +14,7 @@ function demarage() {
     //lumiere(scene);
     repere(scene);
 
-    //ajout de plusieurs lumieres directionelles avec envoie d'ombre, et une lumiere ambiente
+    //Ajout de plusieurs lumières directionelles avec envoie d'ombres, ainsi qu'une lumière ambiante
     let light1 = new THREE.DirectionalLight(0xFFFFFF, 0.5, 100);
     light1.position.set(-25, 25, 80);
     light1.target.position.set(0, 0, 0);
@@ -53,7 +53,7 @@ function demarage() {
     repere(scene);
 
 
-    // deplacement avec souris
+    //Déplacement avec souris
     const element = document.getElementById("webgl");
     let controls = new THREE.TrackballControls(camera, element);
     const clock = new THREE.Clock();
@@ -76,17 +76,18 @@ function demarage() {
     renduAnim();
 
 
-    // ajoute le rendu dans l'element HTML
+    //Ajoute du rendu dans l'élément HTML
     document.getElementById("webgl").appendChild(rendu.domElement);
 
-    // affichage de la scene
+    //Affichage de la scène
     rendu.render(scene, camera);
 
     function reAffichage() {
         setTimeout(function () {
 
-        }, 200);// fin setTimeout(function ()
-        // render avec requestAnimationFrame
+        }, 200); 
+        //Fin setTimeout(function ()
+        //render avec requestAnimationFrame
         rendu.render(scene, camera);
     }// fin fonction reAffichage()
 
@@ -94,9 +95,9 @@ function demarage() {
 
     function renduAnim() {
         stats.update();
-        // render avec requestAnimationFrame
+        //render avec requestAnimationFrame
         requestAnimationFrame(renduAnim);
-// ajoute le rendu dans l'element HTML
+        //Ajoute du rendu dans l'element HTML
         rendu.render(scene, camera);
     }
 
