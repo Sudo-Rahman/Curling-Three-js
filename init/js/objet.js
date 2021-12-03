@@ -1,5 +1,5 @@
-//############ La creation des objets ont nécessité des valeurs prédefinis, je les ais choisis aleatoirement ###############
-//############## A part pour les les lathe de bezier et les points de jointure qui ont été fait sur feuille et reporter ici ############
+//############ La création des objets a nécessité des valeurs prédefinies, on les a choisis aléatoirement, ###############
+//############## à part pour les lathes de Bézier et les points de jointure qui ont été fait sur feuille et reportés ici ############
 // creation de la piste
 function Piste(param) {
     const geometrypiste = new THREE.CubeGeometry(param.longueur, param.largeur, 0.01);
@@ -15,12 +15,12 @@ function Piste(param) {
     const B = new THREE.Vector3(plane.position.x - 0.70 * (param.longueur / 2), plane.position.y + param.largeur / 2, 0);
 
 
-    const line = segment(A, B, "black", 5);//construction de la ligne de depart
-    line.position.z = 0.01;// surelevation de la ligne pour l'apercevoir sur la piste
+    const line = segment(A, B, "black", 5); //Construction de la ligne de départ
+    line.position.z = 0.01; //Surélévation de la ligne pour l'apercevoir sur la piste
 
-    //creation de 4 disques pour faire la maison
-    let inside = param.largeur * 0.60 / 2;// variable qui permet de connaitre la distance interieur du RingGeometry au niveau des bord de la piste
-    let outside = param.largeur * 0.90 / 2;// variable qui permet de connaitre la distance l'exterieur du RingGeometry au niveau des bord de la piste
+    //Création de quatre disques constituant faire la maison
+    let inside = param.largeur * 0.60 / 2; //Variable qui permet de connaitre la distance interieur du RingGeometry au niveau des bords de la piste
+    let outside = param.largeur * 0.90 / 2; //Variable qui permet de connaitre la distance exterieur du RingGeometry au niveau des bords de la piste
     const geometrydisque1 = new THREE.RingGeometry(inside, outside, 150);
     const materialdisque1 = new THREE.MeshPhongMaterial({color: 'blue', side: THREE.DoubleSide, specular: 0x111111});
     const circle1 = new THREE.Mesh(geometrydisque1, materialdisque1);
@@ -47,7 +47,7 @@ function Piste(param) {
     circle4.position.z = 0.01;
 
 
-    //creation du groupe pour tous les objets
+    //Création du groupe pour tous les objets
     const group = new THREE.Group();
     group.add(plane);
     group.add(line);
@@ -55,16 +55,16 @@ function Piste(param) {
     group.add(circle2);
     group.add(circle3);
     group.add(circle4);
-    //on boucle sur tous les material des objet pour activer les ombres et les brillances
+    //On boucle sur tous les materiaux des objets pour activer les ombres et les brillances
     for (let i = 0; i < group.children.length; i++) {
         group.children[i].receiveShadow = true;
         group.children[i].material.emissive = 0x0;
         group.children[i].material.shininess = 100;
     }
-    return group;
+    return [group,circle4];
 }
 
-// creation de l'objet balai
+//Création de l'objet balai
 function Balai(param) {
     const geometry_manche = new THREE.CylinderGeometry(param.rayon, param.rayon / 1.5, param.hauteur, 100);
     const mesh_manche = new THREE.MeshPhongMaterial({
@@ -84,7 +84,7 @@ function Balai(param) {
 
     const group = new THREE.Group();
 
-    //creation des poils
+    //Création des poils
     for (let i = 0; i < param.nbPoils; i++) {
         const geometrypoile = new THREE.CylinderGeometry(0.01, 0, 0.05, 16);
         const materialpoile = new THREE.MeshPhongMaterial({
@@ -109,7 +109,7 @@ function Balai(param) {
 
 }
 
-//creation de la pierre
+//Création de la pierre
 function Pierre(param) {
     //creation d'un disque qui sera le bas de la pierre
     const surface_bas_circle = new THREE.Mesh(new THREE.CircleGeometry(0.05 + param.taille * 0.3, 256), new THREE.MeshPhongMaterial({
@@ -123,9 +123,8 @@ function Pierre(param) {
     surface_bas_circle.position.z = 0;
 
     //#################              IMPORTANT           #######################
-    // chaque objet a des valeurs classique et un multiplicateur qui servira a modifié la taille des objets !!!!!!!
-
-    //creation du point de depart, 2 points de controles P1 P2 et le point d'arriver G1 qui servira aussi de gointure
+    //Chaque objet a des valeurs classiques et un multiplicateur qui servira à modifier la taille des objets 
+    //Création du point de départ, de deux points de contrôle P1, P2 et du point d'arrivée G1 (qui servira aussi de jointure)
     let P0 = new THREE.Vector3(0.05 + param.taille * 0.3, 0, 0);
     let P1 = new THREE.Vector3(param.taille * 1.35, param.taille * 0.2, 0);
     let P2 = new THREE.Vector3(param.taille * 1.3, param.taille * 0.6, 0);
@@ -136,12 +135,12 @@ function Pierre(param) {
         color: param.coul,
         side: THREE.DoubleSide,
         specular: 0x111111
-    }));//creation du lathé
-    surface_bas.rotation.x = Math.PI / 2;// on tourne l'objet pour qu'il soit a l'horizontal
+    })); //Création de la lathe
+    surface_bas.rotation.x = Math.PI / 2; //On tourne l'objet pour qu'il soit à l'horizontal
     surface_bas.position.z = 0;
 
-    // creaztion de la tranche du millieu qui sera d'une couleur diferente des 2 autres surfaces de revolution
-    //utilisation du point G1 comme point de depart,creation 2 points de controles A1 A2 et le point d'arriver G2 qui servira aussi de gointure pour la prochaine surface de revolution qui completera la pierre
+    //Création de la tranche du milieu qui sera d'une couleur différente des deux autres surfaces de révolution
+    //Utilisation du point G1 comme point de départ, création de deux points de contrôle A1, A2 et du point d'arrivée G2 (qui servira aussi de jointure pour la prochaine surface de révolution qui complètera la pierre)
     let A1 = new THREE.Vector3(param.taille * 1.3, param.taille * 0.6, 0);
     let A2 = new THREE.Vector3(param.taille * 1.3, param.taille * 0.6, 0);
     let G2 = new THREE.Vector3(param.taille * 1.3, param.taille * 0.8, 0);
@@ -152,11 +151,11 @@ function Pierre(param) {
         side: THREE.DoubleSide,
         specular: 0x111111
     }));
-    surface_milieu.rotation.x = Math.PI / 2;// on tourne l'objet pour qu'il soit a l'horizontal
+    surface_milieu.rotation.x = Math.PI / 2; //On tourne l'objet pour qu'il soit à l'horizontal
     surface_milieu.position.z = 0;
 
-    // creation de la 2 surface de revolution
-    // utilisation du point de gointure G2, creation de 2 points de controles M1, M2 et du point d'arriver M0
+    //Création de la seconde surface de révolution
+    //Utilisation du point de jointure G2, création de deux points de contrôle M1, M2 et du point d'arrivée M0
     let M0 = new THREE.Vector3(0.05 + param.taille * 0.3, param.taille * 0.6 + G2.y, 0);
     let M1 = new THREE.Vector3(param.taille * 1.3, param.taille * 0.2 + G1.y, 0);
     let M2 = new THREE.Vector3(param.taille * 1.35, param.taille * 0.6 + G1.y, 0);
@@ -167,11 +166,11 @@ function Pierre(param) {
         side: THREE.DoubleSide,
         specular: 0x111111
     }));
-    surface_haut.rotation.x = Math.PI / 2;// on tourne l'objet pour qu'il soit a l'horizontal
+    surface_haut.rotation.x = Math.PI / 2; //On tourne l'objet pour qu'il soit à l'horizontal
     surface_haut.position.z = 0;
 
 
-    //creation d'un disque qui fermera le haut du disque
+    //Création d'un disque qui fermera le haut du disque
     const surface_haut_circle = new THREE.Mesh(new THREE.CircleGeometry(0.05 + param.taille * 0.3, 256), new THREE.MeshPhongMaterial({
         color: param.coul,
         side: THREE.DoubleSide,
@@ -179,27 +178,27 @@ function Pierre(param) {
     }));
     surface_haut_circle.position.x = 0;
     surface_haut_circle.position.y = 0;
-    surface_haut_circle.position.z = M0.y;// on positionne le disuqe a la position de hauteur du point M0 pour fermer le lathe
+    surface_haut_circle.position.z = M0.y; //On positionne le disque à la position de hauteur du point M0 pour fermer la lathe
 
 
-    //creation de l'endroit ou l'on tient la pierre grace a 2 cylindres qui sont de dimension 0.2 fois le nombre du gui
+    //Création de l'anse de la pierre grâce à deux cylindres qui sont de dimension 0.2 fois le nombre du GUI
     const endroit_pour_tenir_geometry = new THREE.Mesh(new THREE.CylinderGeometry(param.taille * 0.2, param.taille * 0.2, param.taille * 1.5, 64), new THREE.MeshPhongMaterial({
         color: param.coul_endroit_pour_tenir,
         side: THREE.DoubleSide,
     }));
-    endroit_pour_tenir_geometry.position.z = surface_haut_circle.position.z;// positionnement sur le haut de la pierre
-    endroit_pour_tenir_geometry.rotation.x = Math.PI / 2; // tourne le cylindre a la verticale
+    endroit_pour_tenir_geometry.position.z = surface_haut_circle.position.z; //Positionnement sur le haut de la pierre
+    endroit_pour_tenir_geometry.rotation.x = Math.PI / 2; //On tourne le cylindre à la verticale
 
     const endroit_pour_tenir_geometry1 = new THREE.Mesh(new THREE.CylinderGeometry(param.taille * 0.2, param.taille * 0.2, param.taille * 1.5, 64), new THREE.MeshPhongMaterial({
         color: param.coul_endroit_pour_tenir,
         side: THREE.DoubleSide,
         specular: 0x111111
     }));
-    endroit_pour_tenir_geometry1.position.z = surface_haut_circle.position.z + endroit_pour_tenir_geometry.geometry.parameters.height / 2;//positionnement sur le premier cylindre
-    endroit_pour_tenir_geometry1.position.y = endroit_pour_tenir_geometry1.geometry.parameters.height / 2.6;// positionne en sorte que le debut du cylindre 2 se mette sur le cylindre 1 pour faire une equerre
+    endroit_pour_tenir_geometry1.position.z = surface_haut_circle.position.z + endroit_pour_tenir_geometry.geometry.parameters.height / 2; //Positionnement sur le premier cylindre
+    endroit_pour_tenir_geometry1.position.y = endroit_pour_tenir_geometry1.geometry.parameters.height / 2.6; //Positionne de sorte que le début du cylindre 2 se mette sur le cylindre 1 pour faire une équerre
 
 
-    // on ajoute les objets dans un groupe pour en faire un seul objet
+    //On ajoute les objets dans un groupe pour en faire un seul objet
     const group = new THREE.Group();
     group.add(surface_bas_circle);
     group.add(surface_bas);
@@ -208,7 +207,7 @@ function Pierre(param) {
     group.add(surface_haut_circle);
     group.add(endroit_pour_tenir_geometry);
     group.add(endroit_pour_tenir_geometry1);
-    //on boucle sur tous les material des objet pour qu'il crée des ombres au contacte de la lumiere
+    //On boucle sur tous les matériaux des objets pour qu'ils crééent des ombres au contact de la lumière
     for (let i = 0; i < group.children.length; i++) {
         group.children[i].castShadow = true;
     }
