@@ -2,7 +2,7 @@ var xDir = 0;
 var yDir = 0;
 var zDir = 0.25;
 
-function cameraLumiere(scene, camera) {   // creation de la camera
+function cameraLumiere(scene, camera) {   //Création de la caméra
     camera.up = new THREE.Vector3(0, 0, 1);
     let xPos = 3;
     let yPos = 3;
@@ -14,7 +14,7 @@ function cameraLumiere(scene, camera) {   // creation de la camera
 
 
 //*************************************************************
-//* 
+// 
 //        F I N     C A M E R A
 //
 //*************************************************************
@@ -33,4 +33,4 @@ function lumiere(scene) {
     lumPt1.position.set(5, -15, 15);
     lumPt1.intensity = 1;
     scene.add(lumPt1);
-}// fin fonction lumiere
+} //Fin fonction lumière
