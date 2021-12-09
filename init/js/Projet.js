@@ -249,9 +249,7 @@ function init() {
     });
     guiPiste.addColor(paramPiste, "coul").onChange(function () { //Modification de la largeur de la piste
         if (!etat_partie) { //Si la partie est en cours, on ne replace pas le balai au point de départ
-            scene.remove(piste);
-            piste = piste = new Piste(paramPiste);
-            scene.add(piste);
+            addAndRemovePiste();
             placment_balai();
         }
     });
@@ -408,6 +406,7 @@ function init() {
         if (compteur === 9) { //Si tous les lancers ont été effectués
             arreter_partie(); //On arrête la partie
             placment_balai(); //On replace les balais
+            //console.log(etat_partie);
             return false;
         } else { //Sinon
             compteur++; //On incremente le compteur de 1
@@ -485,6 +484,7 @@ function init() {
 
 //Fonction qui arrête la partie quand le compteur atteint le nombre de lancer (qui vaut 9)
     function arreter_partie() {
+        etat_partie = false;
         let pierre = actualisationDistancetoMaison();
         // console.log(pierre);
         if (pierre != null) {
